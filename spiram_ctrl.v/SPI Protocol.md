@@ -47,6 +47,11 @@ En este caso las líneas de entrada y salida se interconectan entre los perifér
 
 ![Chain.](../Images/Chain.png)
 
+### Comunicación con SPI
+
+La inicialización de la trama de datos siempre viene del controlador (anfitrión) y se puede usar para operaciones de lectura o escritura, el periférico requerido dentro de la solicitud del host se especifica mediante la línea del selector de chip.
+
 # Fuente: 
 
 1. MCI Electronics. (2022, 23 de agosto). Serial Peripheral Interface (SPI). Cursos MCI Electronics. https://cursos.mcielectronics.cl/2022/08/23/serial-peripheral-interface-spi/
+2. Ebyte. (2023, 4 de julio). Explicación detallada del protocolo de comunicación SPI. https://www.es-ebyte.com/news/470
