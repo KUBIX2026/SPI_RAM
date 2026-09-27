@@ -53,11 +53,12 @@ La inicialización de la trama de datos siempre viene del controlador (anfitrió
 
 ### Transmisión de datos: 
 
-Para la comunicación, el controlador SPI debe enviar una frecuencia mediante la línea de reloj que sea soportada por el periférico, lo que a su vez significa que el periférico no se comunica activamente con el controlador sino solamente cuando le es requerida una respuesta. Mediante cada ciclo de reloj SPI se hace envío de una secuencia de datos dúplex completa; controlador envía un BIT desde COPI y periférico responde 1 bit mediante CIPO.
+Para la comunicación, el controlador SPI debe enviar una frecuencia mediante la línea de reloj soportada por el periférico, lo que a su vez significa que el periférico no se comunica activamente con el controlador sino solamente cuando le es requerida una respuesta. Mediante cada ciclo de reloj SPI se hace envío de una secuencia de datos dúplex completa; controlador envía un BIT desde COPI y periférico responde 1 bit mediante CIPO. La comunicación SPI implica dos registros de desplazamiento con una longitud de palabra dada.
 
 
 
 # Fuente: 
 
 1. MCI Electronics. (2022, 23 de agosto). Serial Peripheral Interface (SPI). Cursos MCI Electronics. https://cursos.mcielectronics.cl/2022/08/23/serial-peripheral-interface-spi/
-2. Ebyte. (2023, 4 de julio). Explicación detallada del protocolo de comunicación SPI. https://www.es-ebyte.com/news/470
+2. Ebyte. (2023, 23 de marzo). Guide on SPI communication protocol & FAQ. https://www.cdebyte.com/news/466
+3. 
