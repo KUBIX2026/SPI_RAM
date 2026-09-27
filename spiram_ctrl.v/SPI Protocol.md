@@ -47,9 +47,15 @@ En este caso las líneas de entrada y salida se interconectan entre los perifér
 
 ![Chain.](../Images/Chain.png)
 
-### Comunicación con SPI
+## Comunicación con SPI
 
-La inicialización de la trama de datos siempre viene del controlador (anfitrión) y se puede usar para operaciones de lectura o escritura, el periférico requerido dentro de la solicitud del host se especifica mediante la línea del selector de chip.
+La inicialización de la trama de datos siempre viene del controlador (anfitrión) y se puede usar para operaciones de lectura o escritura, el periférico requerido dentro de la solicitud del host se especifica mediante la línea del selector de chip, con la conexión de datos entre los periféricos y el controlador directa entre los puertos; es decir (SCK a SCK, CIPO a CIPO, COPI a COPI y CS a CS). Ya que cada periférico requiere una línea independiente de selector disponible del controlador, la mayoría de dispositivos SPI usan la lógica de tres estados y cuando no se selecciona, su línea CIPO se convierte en un estado de alta impedancia. Si un dispositivo no tiene salida de tres estados requiere un búfer externo que si los tenga para compartir el BUS SPI con otros dispositivos. 
+
+### Transmisión de datos: 
+
+Para la comunicación, el controlador SPI debe enviar una frecuencia mediante la línea de reloj que sea soportada por el periférico, lo que a su vez significa que el periférico no se comunica activamente con el controlador sino solamente cuando le es requerida una respuesta. Mediante cada ciclo de reloj SPI se hace envío de una secuencia de datos dúplex completa; controlador envía un BIT desde COPI y periférico responde 1 bit mediante CIPO.
+
+
 
 # Fuente: 
 
