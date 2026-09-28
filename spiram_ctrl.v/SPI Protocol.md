@@ -1,4 +1,4 @@
-# Protocolo SPI (SERIAL PERIPHERAL INTERFACE)
+# Protocolo `SPI` (SERIAL PERIPHERAL INTERFACE)
 
 Éste es el protocolo de memoria designado para el funcionamiento de la memoria RAM. Es necesario conocer cómo funciona antes de implementarlo al sistema y para esa finalidad se mencionan aquí las características más importantes. 
 
@@ -55,9 +55,21 @@ La inicialización de la trama de datos siempre viene del controlador (anfitrió
 
 Para la comunicación, el controlador SPI debe enviar una frecuencia mediante la línea de reloj soportada por el periférico, lo que a su vez significa que el periférico no se comunica activamente con el controlador sino solamente cuando le es requerida una respuesta. Mediante cada ciclo de reloj SPI se hace envío de una secuencia de datos dúplex completa; controlador envía un BIT desde COPI y periférico responde 1 bit mediante CIPO. La comunicación SPI implica dos registros de desplazamiento para una palabra de una longitud dada. 
 
-Si se considera un desplazamiento de 8-bits (1 byte) en el controlador y periférico, su conexión, que cuenta con una topología de anillo virtual, intercambia desde el bit más significativo. Por cada cambio de reloj se envía 1 bit de información bilateralmente (CIPO y COPI) y los receptores 
+Si se considera un desplazamiento de 8-bits (1 byte) en el controlador y periférico, su conexión, que cuenta con una topología de anillo virtual, inicia el intercambia desde el bit más significativo. Por cada cambio de reloj se envía 1 bit de información (CIPO y COPI), los receptores de cada lado muestrean el bit transmitido y lo pasan a la condición de menos relevante en el registro de desplazamiento. Cuando los bits en el registro de desplazamiento terminan el controlador y periférico intercambian los valores de registro y si aún faltan datos por enviar el proceso se reinicia. Para lograr esto se hace el uso de dos memorias temporales de línea; una en el controlador y otra en el periférico, siendo la transmisión de datos con cada pulso de reloj simultánea desde ambos lados.
 
+![Transmisión SPI.](../Images/SPI_Communication.png)
 
+Secuencialmente se ve así: 
+
+1. El controlador baja la línea SPI para indicar al periférico el inicio de la comunicación.
+2. El controlador envía la señal de reloj para informar el periférico de las próximas operaciones de lectura/escritura. Se determina la velociad de reloj con base en el periférico dependiendo de si está activo en bajo o alto nivel.
+3. El controlador escribe la información a ser enviada en el búffer-out, pasa al registro de desplazamiento y éste envía la información bit por bit a través de la línea de COPI al periférico, quién en simultáneo está enviando la información en su registro de desplazamiento bit a bit a través de la línea CIPO hacia el controlador donde el registro de desplazamiento la mueve hacia el búffer-in.
+
+### Modos de funcionamiento
+
+El protocolo SPI cuenta con 4 modos de comunicación y para que funcione correctamente tanto el controlador como los periféricos deben tener el mismo. Puesto que los periféricos vienen con este ajuste fijo de fábrica se debe configurar el del controlador; `*fase de reloj*` y `*polaridad del reloj*`.
+
+La polaridad del 
 
 # Fuente: 
 
