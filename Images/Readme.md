@@ -11,3 +11,5 @@ Every image in this folder will be assigned and specified in this file. Based on
 | `CS.png` | Downloaded picture from web forum explaining chip select line from SPI protocol | https://cursos.mcielectronics.cl/2022/08/23/serial-peripheral-interface-spi/ |
 | `Chain.png` | Downloaded picture from web forum explaining chain type connection on SPI | https://cursos.mcielectronics.cl/2022/08/23/serial-peripheral-interface-spi/ |
 | `CS_Independiente.png` | Downloaded picture from web forum explaining independent chip select line connection method on SPI | https://cursos.mcielectronics.cl/2022/08/23/serial-peripheral-interface-spi/ |
+| `Communication_modes.png` | Downloaded picture from web page explaining the mode set for SPI communicaction | https://www.cdebyte.com/news/466 |
+| `SPI_Communication.png` | Downloaded picture from web page explaining SPI communicaction functioning | https://www.cdebyte.com/news/466 |
