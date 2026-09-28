@@ -85,6 +85,13 @@ El protocolo SPI cuenta con 4 modos de comunicación y para que funcione correct
                 |      |
             Subida     Bajada
 
+| Modo SPI | CPOL | CPHA | Estado de Reposo | Flanco de Muestreo (Sample) | Flanco de Cambio (Shift) |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| Modo 0 | 0 | 0 | Bajo (0) | Flanco de subida (1.º) | Flanco de bajada (2.º) 
+| Modo 1 | 0 | 1 | Bajo (0) |　Flanco de bajada (2.º) | Flanco de subida (1.º) |
+| Modo 2 | 1 | 0 | Alto (1) | Flanco de bajada (1.º) | Flanco de subida (2.º) |
+| Modo 3 | 1 | 1 | Alto (1) | Flanco de subida (2.º) | Flanco de bajada (1.º) |
+
 ![Modos de Comunicación.](../Images/Communication_modes.png)
 
 Un resumen de las propiedades del protocolo SPI a continuación: 
@@ -99,6 +106,9 @@ Un resumen de las propiedades del protocolo SPI a continuación:
 | Ratio | Variable, usualmente alto |
 | Escenarios de aplicación | Alta velocidad, comunicación de corta distancia (memorias, sensores, etc). | 
 | Longitud de línea | Buses cortos |
+
+
+
 # Fuente: 
 
 1. MCI Electronics. (2022, 23 de agosto). Serial Peripheral Interface (SPI). Cursos MCI Electronics. https://cursos.mcielectronics.cl/2022/08/23/serial-peripheral-interface-spi/
