@@ -77,12 +77,12 @@ El protocolo SPI cuenta con 4 modos de comunicación y para que funcione correct
 1. `CPHA` = 0 indica que el terminal de salida manda los datos en el flanco de bajada del ciclo anterior de reloj y el terminal de entrada capta los datos en el flanco de subida del ciclo de reloj actual. La salida permanece válida hasta el flanco de bajada del ciclo actual.
 3. `CPHA` = 1 indica que el terminal de salida envía la información en el flanco de subida y la termina de entrada capta la información en el flanco de bajada del ciclo actual. La salida permanece válida hasta el flanco de subide del siguiente ciclo. 
 
-        +------+          +------+
-        |      |          |      |
-  0 ----+      +----------+      +---- 0
-        ^      ^
-        |      |
-    Subida     Bajada
+                +------+          +------+
+                |      |          |      |
+          0 ----+      +----------+      +---- 0
+                ^      ^
+                |      |
+            Subida     Bajada
 
 ![Modos de Comunicación.](../Images/Communication_modes.png)
 
