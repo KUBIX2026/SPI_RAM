@@ -103,4 +103,4 @@ Un resumen de las propiedades del protocolo SPI a continuación:
 
 1. MCI Electronics. (2022, 23 de agosto). Serial Peripheral Interface (SPI). Cursos MCI Electronics. https://cursos.mcielectronics.cl/2022/08/23/serial-peripheral-interface-spi/
 2. Ebyte. (2023, 23 de marzo). Guide on SPI communication protocol & FAQ. https://www.cdebyte.com/news/466
-3. 
+3. Microchip Technology Inc. (2023, December). Getting Started with Serial Peripheral Interface (SPI). https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ApplicationNotes/ApplicationNotes/TB3215-Getting-Started-with-SPI-DS90003215.pdf
