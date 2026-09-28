@@ -107,7 +107,18 @@ Un resumen de las propiedades del protocolo SPI a continuación:
 | Escenarios de aplicación | Alta velocidad, comunicación de corta distancia (memorias, sensores, etc). | 
 | Longitud de línea | Buses cortos |
 
+# `SPI` en `RAM`
 
+Para este caso en particular, se va a trabajar con el protocolo `SPI` para una memoria `RAM`. Por su construcción es un tipo de memoria volátil (pierde la información sin energía) pero tiene ciclos casi ilimitados de lectura/escritura. 
+
+Los protocolos de funcionamiento `SPI` más usados en este tipo de aplicaciones son el 0 y el 3.
+
+| Modo SPI | CPOL | CPHA | Estado de Reposo | Flanco de Muestreo (Sample) | Flanco de Cambio (Shift) |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| Modo 0 | 0 | 0 | Bajo (0) | Flanco de subida (1.º) | Flanco de bajada (2.º) 
+| Modo 3 | 1 | 1 | Alto (1) | Flanco de subida (2.º) | Flanco de bajada (1.º) |
+
+Eso sucede ya que a la memoria no le importa si el reloj reposa en bajo (modo 0) o en alto (modo 3). Por lo general dentro de la tabla de especificaciones de un periférico de RAM suele venir indicado soporte al modo SPI 0 (0,0) y 3 (1,1)
 
 # Fuente: 
 
