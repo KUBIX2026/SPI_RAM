@@ -61,9 +61,10 @@ Si se considera un desplazamiento de 8-bits (1 byte) en el controlador y perifé
 
 Secuencialmente se ve así: 
 
-1. El controlador baja la línea `CS` para indicar al periférico el inicio de la comunicación.
-2. El controlador envía la señal de reloj para informar el periférico de las próximas operaciones de lectura/escritura. Se determina la velociad de reloj con base en el periférico dependiendo de si está activo en bajo o alto nivel.
-3. El controlador escribe la información a ser enviada en el búffer-out, pasa al registro de desplazamiento y éste envía la información bit por bit a través de la línea de `COPI` al periférico, quién en simultáneo está enviando la información en su registro de desplazamiento bit a bit a través de la línea `CIPO` hacia el controlador donde el registro de desplazamiento la mueve hacia el búffer-in.
+1. El controlador configura los parámetros de comunicación e inicializa la línea `CS` a alta (deselecciona todos los periféricos).
+2. El controlador baja la línea `CS` del periférico objetivo para indicarle el inicio de la comunicación.
+3. El controlador envía la señal de reloj para informar el periférico de las próximas operaciones de lectura/escritura. Se determina la velociad de reloj con base en el periférico dependiendo de si está activo en bajo o alto nivel.
+4. El controlador escribe la información a ser enviada en el búffer-out, pasa al registro de desplazamiento y éste envía la información bit por bit a través de la línea de `COPI` al periférico, quién en simultáneo está enviando la información en su registro de desplazamiento bit a bit a través de la línea `CIPO` hacia el controlador donde el registro de desplazamiento la mueve hacia el búffer-in.
 
 ### Modos de funcionamiento
 
@@ -86,6 +87,17 @@ El protocolo SPI cuenta con 4 modos de comunicación y para que funcione correct
 
 ![Modos de Comunicación.](../Images/Communication_modes.png)
 
+Un resumen de las propiedades del protocolo SPI a continuación: 
+
+| Propiedad | `SPI` |
+| Número de líneas del bus | 4 (COPI/MOSI, CIPO/MISO, SCK/CLK, CS) |
+| Topología | Controlador úncio |
+| Reloj | Línea independiente (SCK/CLK) |
+| Selección de dispositivo | Uso de línea CS |
+| Polaridad y fase de reloj | Configurables en el controlador (CPOL, CPHA) |
+| Ratio | Variable, usualmente alto |
+| Escenarios de aplicación | Alta velocidad, comunicación de corta distancia (memorias, sensores, etc). | 
+| Longitud de línea | Buses cortos |
 # Fuente: 
 
 1. MCI Electronics. (2022, 23 de agosto). Serial Peripheral Interface (SPI). Cursos MCI Electronics. https://cursos.mcielectronics.cl/2022/08/23/serial-peripheral-interface-spi/
