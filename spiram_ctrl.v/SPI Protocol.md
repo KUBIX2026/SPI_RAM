@@ -90,6 +90,7 @@ El protocolo SPI cuenta con 4 modos de comunicación y para que funcione correct
 Un resumen de las propiedades del protocolo SPI a continuación: 
 
 | Propiedad | `SPI` |
+| :--- | :--- |
 | Número de líneas del bus | 4 (COPI/MOSI, CIPO/MISO, SCK/CLK, CS) |
 | Topología | Controlador úncio |
 | Reloj | Línea independiente (SCK/CLK) |
