@@ -107,7 +107,7 @@ Aunque la base del funcionamiento SPI se explica en gran extensión con las defi
 3. `SPI` Quad (4 but `half-duplex`): líneas `COPI`/`CIPO` híbridas:
    * Es un calco de la arquitectura Dual en su esencia pero se agregan 2 líneas de datos para 4 en total (`SIO0`, `SIO1`, `SIO2`, `SIO3`).
    * En cada pulso de memoria se transmite un nibble completo (4 bits) hacia o desde la memoria.
-   * Sigue siendo `hald-duplex`.
+   * Sigue siendo `half-duplex`.
    * Aunque el estándar del SPI exige la presencia de 4 líneas de bus, las líneas `SIO2` y `SIO3` adicionales para transmisión se obtienen a partir de la configuración física de los pines de la memoria RAM y su modificación de comportamiento mediante comandos de software.
 
             SPI ESTÁNDAR (1-bit)                       QUAD SPI (4-bit)
