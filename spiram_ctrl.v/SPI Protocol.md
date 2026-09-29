@@ -6,7 +6,7 @@ El nombre del protocolo, por sus siglas en inglés, significa interfaz de perif�
 Aunque el protocolo es serial, no consiste en el serial convensional con TX y RX asíncrono sin control sobre las líneas de datos; no se sabe cuándo se envían los datos ni se asegura que estén sincronizados con un único reloj (obligatorio en equipos de computación). Para corregir los problemas producto de la asincronía en el protocolo convencional, se crearon algunos métodos para permitir la lectura correcta de los datos como: 
 
 * Establecer una velocidad de transmisión previa al envío de un byte.
-* La aparición de bits de inicio y parada en cada que permitían al receptor corregir las pequeñas diferencias en la velocidad de transmisión.\
+* La aparición de bits de inicio y parada en cada que permitían al receptor corregir las pequeñas diferencias en la velocidad de transmisión.
 
 Aunque el protocolo serial convencional funcionaba, se generaba mucha carga por la presencia de los bits adicionales y podían producirse errores.
 
@@ -19,7 +19,7 @@ Para corregir los problemas en la diferencia del reloj del protocolo serial conv
 
 Aunque esto soluciona la parte correspondiente al envío de información, aún falta definir como se recibe la información.
 
-### Líneas `CIPO`/`COPI`
+### Líneas `CIPO`/`COPI` según última modificación de la OSHWA o `MISO`/`MOSI` según el estándar habitual.
 
 En `SPI` la señal del reloj (`CLK` o `SCK`) es enviada desde un único lado denominado controlador (microcontrolador spiram_ctrl.v) y el lado que la recibe se denomina periférico (chip de memoria); aunque pueden haber muchos periféricos, sólo hay un controlador. Cuando los datos se envían hacia el periférico desde el controlador se hace por una línea denominada `COPI` (controller out-peripheral in) y cuando se envían del periférico al controlador se denominan `CIPO` (controller in-peripheral out). En este caso pueden haber dos líneas de datos, de forma que cuando el controlador envía información al periférico lo hace mediante la línea de `COPI` y si el periférico necesita enviar una respuesta lo hará mediante otra línea llamada `CIPO` conservando la sincronización con los ciclos de reloj del controlador (no desaparecen).
 
@@ -109,16 +109,48 @@ Un resumen de las propiedades del protocolo SPI a continuación:
 
 # `SPI` en `RAM`
 
-Para este caso en particular, se va a trabajar con el protocolo `SPI` para una memoria `RAM`. Por su construcción es un tipo de memoria volátil (pierde la información sin energía) pero tiene ciclos casi ilimitados de lectura/escritura. 
+Para este caso en particular, se va a trabajar con el protocolo `SPI` para una memoria `RAM`. Por su construcción es un tipo de memoria volátil (pierde la información sin energía) pero tiene ciclos casi ilimitados de lectura/escritura.  
 
 Los protocolos de funcionamiento `SPI` más usados en este tipo de aplicaciones son el 0 y el 3.
 
-| Modo SPI | CPOL | CPHA | Estado de Reposo | Flanco de Muestreo (Sample) | Flanco de Cambio (Shift) |
+| Modo `SPI` | `CPOL` | `CPHA` | Estado de Reposo | Flanco de Muestreo (Sample) | Flanco de Cambio (Shift) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | Modo 0 | 0 | 0 | Bajo (0) | Flanco de subida (1.º) | Flanco de bajada (2.º) 
 | Modo 3 | 1 | 1 | Alto (1) | Flanco de subida (2.º) | Flanco de bajada (1.º) |
 
 Eso sucede ya que a la memoria no le importa si el reloj reposa en bajo (modo 0) o en alto (modo 3). Por lo general dentro de la tabla de especificaciones de un periférico de RAM suele venir indicado soporte al modo SPI 0 (0,0) y 3 (1,1)
+
+## Comandos de la memoria `RAM`
+
+En general el protocolo `SPI` cuenta con distintos comandos según corresponda al tipo de periférico. Para la memoria `RAM` algunos de los comandos más comunes se presentan aa continuación: 
+
+| Comando | Opcode (Hex) | Descripción |
+| `READ` | 0x03 | Lee datos de la memoria a partir de una dirección. |
+| `WRITE` |　0x02 | Escribe datos en la memoria a partir de una dirección. |
+| `EDIO` | 0x3B | Entra en modo Dual I/O (2 bits). |
+| `EQIO` | 0x38 | Entra en modo Quad I/O (4 bits). |
+| `RSTIO` | 0xFF | Sale del modo Quad/Dual y regresa al modo SPI estándar de 1 bit. |
+| `RDSR` | 0x05 | Lee el Registro de Estado (Status Register). |
+| `WRSR` | 0x01 | Escribe el Registro de Estado (para configurar modos de acceso). |
+
+Como se especificaba anteriormente, el `SPI` en la `RAM` suele usar el modo 0 y 3, pero adicional a eso, algunos de sus métodos de conexión múltiple incluyen el uso del `SPI` estándar (1 bit; 1 línea entrada y 1 línea de salida), dual (2 bit; líneas de entrada y salida se vuelven bidireccionales) o quad (4 bit; 4 líneas de datos bidireccionales) según requiera el ancho de banda. 
+
+## Secuencia típica en una transacción
+
+El comportamiento esperado en el funcionamiento de una memoria `SPI`-`RAM` durante su operación consta de las siguientes partes:
+
+1. `Inicio`: controlador baja la línea `CS` a 0.
+2. `Fase de Comando`: el controlador envía 1 byte por `COPI`/`MOSI` con el código de operación (Opcode) sincronizado bit a bit con `SCK`.
+3. `Fase de dirección`: el controlador envía la dirección de memoria deseada (16 o 24 bits usualmente) por `COPI`/`MOSI`.
+4. `Fase de datos`:
+   * *Escritura*: el controlador envía la ráfaga de bytes por `COPO`/`MOSI`.
+   * *lectura*: el controlador conmuta el `SCK` mientras la memoria responde enviando los bytes solicitados por la línea `CIPO`/`MISO`.
+5. `Cierre`: El controlador sube la línea `CS` a 1 para deshabilitar la memoria y dar por terminada la transacción.
+
+La memoria RAM tiene la ventaja de no requerir tiempos de borrado, lo que le permite hacer escrituras arbitrarias instantáneas byte a byte o en ráfagas continuas de forma indefinida sin causar degradación. Sus modos de ráfaga son: 
+1. `Byte Mode`: Lee/escribe 1 solo byte por ciclo.
+2. `Page Mode`: Lee/escribe en bloques (16, 32 bytes, etc).
+3. `Sequential`/`Burst Mode`: Lee/escribe de forma continua a lo largo de toda la matriz de memoria mientras `CS` permanezca en 0 y `SCK` conmute. 
 
 # Fuente: 
 
