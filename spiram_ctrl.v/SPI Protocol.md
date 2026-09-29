@@ -103,10 +103,28 @@ Aunque la base del funcionamiento SPI se explica en gran extensión con las defi
    * La línea `COPI` se renombra como `SIO0` y `CIPO` como `SIO1`.
    * Ambas líneas cambian de rol según el momento: cuando el maestro transmite una dirección o comando, envía dos bits por ciclo de reloj usando `SIO0` y `SIO1` en paralelo hacia la memoria. Cuando la memoria responde leyendo los datos la dirección del bus se invierte y la memoria también envía 2 bits por ciclo de reloj a través de `SIO0` y `SIO1`.
    * Consecuencia: es la itad del tiempo de transferencia pero funciona en `Half-Dúplex`; o transmite o recibe pero ya no ambos en simultáneo.
+   * Para la activación de este modo se debe enviar un comando al periférico.
 3. `SPI` Quad (4 but `half-duplex`): líneas `COPI`/`CIPO` híbridas:
    * Es un calco de la arquitectura Dual en su esencia pero se agregan 2 líneas de datos para 4 en total (`SIO0`, `SIO1`, `SIO2`, `SIO3`).
    * En cada pulso de memoria se transmite un nibble completo (4 bits) hacia o desde la memoria.
    * Sigue siendo `hald-duplex`.
+   * Aunque el estándar del SPI exige la presencia de 4 líneas de bus, las líneas `SIO2` y `SIO3` adicionales para transmisión se obtienen a partir de la configuración física de los pines de la memoria RAM y su modificación de comportamiento mediante comandos de software.
+
+            SPI ESTÁNDAR (1-bit)                       QUAD SPI (4-bit)
+            +-----------------------+                +-----------------------+
+            | 1: CS#         8: VCC |                | 1: CS#         8: VCC |
+            | 2: SO (MISO)   7: HOLD|                | 2: SIO1        7: SIO3| <-- Línea datos 3
+            | 3: WP#         6: SCK |  ============> | 3: SIO2        6: SCK | <-- Línea datos 2
+            | 4: VSS         5: SI  |     COMANDO    | 4: VSS         5: SIO0|
+            +-----------------------+      EQIO      +-----------------------+
+                                     ( software )
+     * Del lado del controlador se requiere redefinir 4 puertos bidireccionales combinado con un puerto SPI diferente con 4 líneas de datos.
+    
+       ```verilog
+        inout wire [3:0] spi_sio; // SIO0, SIO1, SIO2, SIO3
+        ```
+     * El funcionamiento inicial al encender la `FPGA` es el usual de `SPI` estándar con `SIO0` (`COPI`) y `SIO1` (`CIPO`) mientras que `SIO2` y `SIO3` se mantienen en nivel alto por la resistencia de pull-up del hardware.
+     * Para la activación de este modo se debe enviar un comando al periférico.
 
 En resumen: 
 
@@ -116,8 +134,9 @@ En resumen:
 | Dual SPI | 2 bits bidireccionales | "2 líneas (SIO0, SIO1)" | Half-Duplex | 2 bits enviados OR 2 bits recibidos |
 | Quad SPI (QSPI) | 4 bits bidireccionales | 4 líneas (SIO0 a SIO3) | Half-Duplex | 4 bits enviados OR 4 bits recibidos |
    
+# Recapitulación `SPI`
 
-Un resumen de las propiedades del protocolo SPI a continuación: 
+Un resumen de las propiedades del protocolo SPI básicas se muestra a continuación: 
 
 | Propiedad | `SPI` |
 | :--- | :--- |
