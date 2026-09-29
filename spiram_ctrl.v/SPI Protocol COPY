@@ -129,9 +129,9 @@ En general el protocolo SPI cuenta con distintos comandos según corresponda al 
 | WRITE |　0x02 | Escribe datos en la memoria a partir de una dirección. |
 | EDIO| 0x3B | Entra en modo Dual I/O (2 bits). |
 | EQIO | 0x38 | Entra en modo Quad I/O (4 bits). |
-| RSTIO| 0xFF | Sale del modo Quad/Dual y regresa al modo SPI estándar de 1 bit [Certain].
-RDSR0x05Lee el Registro de Estado (Status Register) [Certain].
-WRSR0x01Escribe el Registro de Estado (para configurar modos de acceso) [Certain].
+| RSTIO| 0xFF | Sale del modo Quad/Dual y regresa al modo SPI estándar de 1 bit. |
+| RDSR | 0x05 | Lee el Registro de Estado (Status Register). |
+| WRSR | 0x01 | Escribe el Registro de Estado (para configurar modos de acceso). |
 
 # Fuente: 
 
