@@ -125,6 +125,7 @@ Eso sucede ya que a la memoria no le importa si el reloj reposa en bajo (modo 0)
 En general el protocolo `SPI` cuenta con distintos comandos según corresponda al tipo de periférico. Para la memoria `RAM` algunos de los comandos más comunes se presentan aa continuación: 
 
 | Comando | Opcode (Hex) | Descripción |
+| :--- | :--- | :--- |
 | `READ` | 0x03 | Lee datos de la memoria a partir de una dirección. |
 | `WRITE` |　0x02 | Escribe datos en la memoria a partir de una dirección. |
 | `EDIO` | 0x3B | Entra en modo Dual I/O (2 bits). |
