@@ -151,7 +151,14 @@ El comportamiento esperado en el funcionamiento de una memoria `SPI`-`RAM` duran
 La memoria RAM tiene la ventaja de no requerir tiempos de borrado, lo que le permite hacer escrituras arbitrarias instantáneas byte a byte o en ráfagas continuas de forma indefinida sin causar degradación. Sus modos de ráfaga son: 
 1. `Byte Mode`: Lee/escribe 1 solo byte por ciclo.
 2. `Page Mode`: Lee/escribe en bloques (16, 32 bytes, etc).
-3. `Sequential`/`Burst Mode`: Lee/escribe de forma continua a lo largo de toda la matriz de memoria mientras `CS` permanezca en 0 y `SCK` conmute. 
+3. `Sequential`/`Burst Mode`: Lee/escribe de forma continua a lo largo de toda la matriz de memoria mientras `CS` permanezca en 0 y `SCK` conmute.
+
+## Secuencia típica en SoC
+
+Un ejemplo del funcionamiento de este controlador (`spiram_ctrl.v`) en el contexto de la FPGA sería: 
+1. La CPU solicita una lectura requiriendo una dirección paralela (ej. 0x1000).
+2. `spiram_ctrl.v` baja 'CS', transfiere el opcode `0x03` por `COPI`/`MOSI` seguido de los 16/24 bits de dirección `Ox1000`.
+3. El módulo recibe por `CIPO`/`MISO` los 8/16/32 bits requeridos, desactiva `CS` y se los entrega a la CPI por el bus paralelo interno.
 
 # Fuente: 
 
