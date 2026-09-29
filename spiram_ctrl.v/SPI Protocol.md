@@ -171,7 +171,7 @@ En general el protocolo `SPI` cuenta con distintos comandos según corresponda a
 | Comando | Opcode (Hex) | Descripción |
 | :--- | :--- | :--- |
 | `READ` | 0x03 | Lee datos de la memoria a partir de una dirección. |
-| `WRITE` |　0x02 | Escribe datos en la memoria a partir de una dirección. |
+| `WRITE` | 0x02 | Escribe datos en la memoria a partir de una dirección. |
 | `EDIO` | 0x3B | Entra en modo Dual I/O (2 bits). |
 | `EQIO` | 0x38 | Entra en modo Quad I/O (4 bits). |
 | `RSTIO` | 0xFF | Sale del modo Quad/Dual y regresa al modo SPI estándar de 1 bit. |
