@@ -204,9 +204,7 @@ Un ejemplo del funcionamiento de este controlador (`spiram_ctrl.v`) en el contex
 2. `spiram_ctrl.v` baja 'CS', transfiere el opcode `0x03` por `COPI`/`MOSI` seguido de los 16/24 bits de dirección `Ox1000`.
 3. El módulo recibe por `CIPO`/`MISO` los 8/16/32 bits requeridos, desactiva `CS` y se los entrega a la CPI por el bus paralelo interno.
 
-## Algoritmo de comunicación SPI RAM (FSM).
-
-## Algoritmo de Comunicación SPI RAM (FSM)
+## Algoritmo de Comunicación SPI RAM (FSM) [IA asistido]
 
 El módulo `spiram_ctrl.v` actúa como un puente de conversión entre el bus paralelo del procesador y el bus serie de la memoria física.
 
@@ -235,9 +233,73 @@ always @(posedge clk or posedge reset) begin
     end
 end
 ```
+De forma visual, eso se vería así: 
+
+* Algoritmo 1: Operación de escritura
+
+      [ CPU ]                   [ Controlador spiram_ctrl.v ]             [ Memoria SPI RAM ]
+         |                                    |                                    |
+         |-- 1. Solicita Lectura ------------>|                                    |
+         |   (Dirección: 0x01A4)              |                                    |
+         |                                    |-- 2. Activa línea CS (CS = 0) ---->|
+         |                                    |                                    |
+         |                                    |-- 3. Transmite Opcode (0x03) ----->|
+         |                                    |   (Sincronizado con SCLK, MSB 1.º) |
+         |                                    |                                    |
+         |                                    |-- 4. Transmite Dirección --------->|
+         |                                    |   (0x01A4 en 16 o 24 bits)         |
+         |                                    |                                    |
+         |                                    |<-- 5. Devuelve Dato Leído ---------|
+         |                                    |    (8 bits por la línea MISO/SIO)  |
+         |                                    |                                    |
+         |                                    |-- 6. Desactiva línea CS (CS = 1) ->|
+         |<-- 7. Entrega Dato Paralelo -------|                                    |
+         |    (ej. 8'hA5 a la CPU)            |                                    |
+
+El paso a paso del algoritmo sería así:
+
+1. Petición del Sistema (CPU): La CPU coloca la dirección deseada (ej. 0x01A4) en el bus interno y activa la señal de lectura read_enable = 1. 
+2. Inicio de Transacción SPI: El controlador spiram_ctrl.v detecta la solicitud, pasa a su estado de transmisión y baja la línea CS a 0 para activar la memoria. 
+3. Envío del Comando: El controlador conmuta la señal SCLK y envía serialmente por MOSI (o SIO0) el opcode de lectura 0x03 (8'b00000011) bit a bit. 
+4. Envío de Dirección: Sin subir CS, el controlador transmite los bytes de la dirección direccionada (0x01A4).
+5. Recepción del Dato: El controlador mantiene conmutando SCLK. La memoria lee internamente la celda de la matriz y conmuta la línea MISO (o SIO[3:0] en Quad) enviando el dato almacenado bit a bit en los flancos de reloj.
+6. Cierre de Bus: El controlador captura el byte completo en un registro interno de desplazamiento (Shift Register) y sube CS a 1 para terminar el ciclo del bus.
+7. Respuesta a la CPU: El controlador coloca el byte leído en el bus de datos paralelo hacia la CPU y activa la señal de listo/completado (ready = 1).
+
+* ALgoritmo 2: Operación de Escritura
+
+      [ CPU ]                   [ Controlador spiram_ctrl.v ]             [ Memoria SPI RAM ]
+         |                                    |                                    |
+         |-- 1. Solicita Escritura ---------->|                                    |
+         |   (Dirección: 0x01A4, Dato: 0xFF)  |                                    |
+         |                                    |-- 2. Activa línea CS (CS = 0) ---->|
+         |                                    |                                    |
+         |                                    |-- 3. Transmite Opcode (0x02) ----->|
+         |                                    |   (Sincronizado con SCLK)          |
+         |                                    |                                    |
+         |                                    |-- 4. Transmite Dirección --------->|
+         |                                    |   (0x01A4)                         |
+         |                                    |                                    |
+         |                                    |-- 5. Transmite Dato (0xFF) ------->|
+         |                                    |   (Escribe en celda en tiempo real)|
+         |                                    |                                    |
+         |                                    |-- 6. Desactiva línea CS (CS = 1) ->|
+         |<-- 7. Confirma Escritura ----------|                                    |
+         |    (ready = 1)                     |                                    |
+
+El paso a paso sería así: 
+
+1. Petición del Sistema (CPU): La CPU coloca la dirección (0x01A4), el dato a guardar (ej. 0xFF) y activa write_enable = 1.
+2. Inicio de Transacción SPI: spiram_ctrl.v baja CS a 0. 
+3. Envío del Comando de Escritura: El controlador transmite serialmente el opcode 0x02 (8'b00000010) por MOSI.
+4. Envío de Dirección: Mantiene la secuencia enviando la dirección destino (0x01A4).
+5. Inyección del Dato: Inmediatamente después del último bit de dirección, el controlador conmuta el byte de datos (0xFF) a través de la línea de salida. La RAM graba directamente el valor en sus celdas sin requerir tiempos de borrado previo.
+6. Finalización: El controlador conmuta CS a 1 para cerrar el ciclo de la memoria.
+7. Aviso a la CPU: El controlador limpia sus banderas internas y notifica a la CPU que la operación ha finalizado exitosamente (ready = 1).
 
 # Fuente: 
 
 1. MCI Electronics. (2022, 23 de agosto). Serial Peripheral Interface (SPI). Cursos MCI Electronics. https://cursos.mcielectronics.cl/2022/08/23/serial-peripheral-interface-spi/
 2. Ebyte. (2023, 23 de marzo). Guide on SPI communication protocol & FAQ. https://www.cdebyte.com/news/466
 3. Microchip Technology Inc. (2023, December). Getting Started with Serial Peripheral Interface (SPI). https://ww1.microchip.com/downloads/aemDocuments/documents/MCU08/ApplicationNotes/ApplicationNotes/TB3215-Getting-Started-with-SPI-DS90003215.pdf
+4. Asistencia de IA: Google Gemini 3.6 Flash [IA].
