@@ -204,6 +204,38 @@ Un ejemplo del funcionamiento de este controlador (`spiram_ctrl.v`) en el contex
 2. `spiram_ctrl.v` baja 'CS', transfiere el opcode `0x03` por `COPI`/`MOSI` seguido de los 16/24 bits de dirección `Ox1000`.
 3. El módulo recibe por `CIPO`/`MISO` los 8/16/32 bits requeridos, desactiva `CS` y se los entrega a la CPI por el bus paralelo interno.
 
+## Algoritmo de comunicación SPI RAM (FSM).
+
+## Algoritmo de Comunicación SPI RAM (FSM)
+
+El módulo `spiram_ctrl.v` actúa como un puente de conversión entre el bus paralelo del procesador y el bus serie de la memoria física.
+
+```verilog
+// Diagrama conceptual de estados de la FSM del controlador
+localparam IDLE      = 3'b000,
+           SEND_CMD  = 3'b001,
+           SEND_ADDR = 3'b010,
+           WRITE_DATA= 3'b011,
+           READ_DATA = 3'b100,
+           DESELECT  = 3'b101;
+
+always @(posedge clk or posedge reset) begin
+    if (reset) begin
+        cs_n <= 1'b1;
+        state <= IDLE;
+    end else begin
+        case (state)
+            IDLE: if (req) begin cs_n <= 1'b0; state <= SEND_CMD; end
+            SEND_CMD:  /* Transmite Opcode (0x03 Lectura / 0x02 Escritura) */ ;
+            SEND_ADDR: /* Transmite Dirección */ ;
+            WRITE_DATA:/* Desplaza bits de salida hacia MOSI/SIO */ ;
+            READ_DATA: /* Muestrea bits de entrada desde MISO/SIO */ ;
+            DESELECT:  begin cs_n <= 1'b1; state <= IDLE; end
+        endcase
+    end
+end
+```
+
 # Fuente: 
 
 1. MCI Electronics. (2022, 23 de agosto). Serial Peripheral Interface (SPI). Cursos MCI Electronics. https://cursos.mcielectronics.cl/2022/08/23/serial-peripheral-interface-spi/
