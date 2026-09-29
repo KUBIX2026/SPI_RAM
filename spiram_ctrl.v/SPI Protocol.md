@@ -94,6 +94,29 @@ El protocolo SPI cuenta con 4 modos de comunicación y para que funcione correct
 
 ![Modos de Comunicación.](../Images/Communication_modes.png)
 
+### Arquitecturas SPI
+
+Aunque la base del funcionamiento SPI se explica en gran extensión con las definiciones previas, han habido desarrollos posteriores que modificaron en cierta medida el cómo se usaba el SPI para aumentar la cantidad del ancho de palabra por ciclo de reloj en una sola dirección, lo que permitió aumentar el flujo de datos. En total se conocen 3 arquitecturas con distintas aplicaciones: 
+1. `SPI` estándar (1 bit `full-duplex`): líneas usuales independientes `CIPO`/`COPI`.
+   * En cada pulso de reloj el maestro envía 1 bit por `COPI` al mismo tiempo que el periférico devuelve 1 bit por `MISO`.
+2. `SPI` Dual (2 bit `half-duplex`): líneas `COPI`/`CIPO` híbridas:
+   * La línea `COPI` se renombra como `SIO0` y `CIPO` como `SIO1`.
+   * Ambas líneas cambian de rol según el momento: cuando el maestro transmite una dirección o comando, envía dos bits por ciclo de reloj usando `SIO0` y `SIO1` en paralelo hacia la memoria. Cuando la memoria responde leyendo los datos la dirección del bus se invierte y la memoria también envía 2 bits por ciclo de reloj a través de `SIO0` y `SIO1`.
+   * Consecuencia: es la itad del tiempo de transferencia pero funciona en `Half-Dúplex`; o transmite o recibe pero ya no ambos en simultáneo.
+3. `SPI` Quad (4 but `half-duplex`): líneas `COPI`/`CIPO` híbridas:
+   * Es un calco de la arquitectura Dual en su esencia pero se agregan 2 líneas de datos para 4 en total (`SIO0`, `SIO1`, `SIO2`, `SIO3`).
+   * En cada pulso de memoria se transmite un nibble completo (4 bits) hacia o desde la memoria.
+   * Sigue siendo `hald-duplex`.
+
+En resumen: 
+
+| Modo de conexión | Ancho de bus (Entrada / Salida) | Trazos de datos reales | Modo de operación | Bits transmitidos por ciclo de reloj |
+| :--- | :--- | :--- | :--- | :--- |
+| SPI Estándar | 1 bit en MOSI + 1 bit en MISO | "2 líneas (MOSI, MISO)" | Full-Duplex | 1 bit enviado AND 1 bit recibido |
+| Dual SPI | 2 bits bidireccionales | "2 líneas (SIO0, SIO1)" | Half-Duplex | 2 bits enviados OR 2 bits recibidos |
+| Quad SPI (QSPI) | 4 bits bidireccionales | 4 líneas (SIO0 a SIO3) | Half-Duplex | 4 bits enviados OR 4 bits recibidos |
+   
+
 Un resumen de las propiedades del protocolo SPI a continuación: 
 
 | Propiedad | `SPI` |
@@ -119,6 +142,8 @@ Los protocolos de funcionamiento `SPI` más usados en este tipo de aplicaciones 
 | Modo 3 | 1 | 1 | Alto (1) | Flanco de subida (2.º) | Flanco de bajada (1.º) |
 
 Eso sucede ya que a la memoria no le importa si el reloj reposa en bajo (modo 0) o en alto (modo 3). Por lo general dentro de la tabla de especificaciones de un periférico de RAM suele venir indicado soporte al modo SPI 0 (0,0) y 3 (1,1)
+
+Por otro lado, ya que en una memoria `RAM` la comunicación es casi siempre uni-procesal por transacción; primero se le pide algo (comando+dirección) y luego ella responde con los datos, el uso de la característica `full-duplex` del protocolo `SPI` resulta infeciennte (se transmitirían datos basura medianta la línea `CIPO` durante el envío de la solicitud por 'COPI'). Es por eso que es común ver el uso de arquitecturas dual o quad en su implementación.
 
 ## Comandos de la memoria `RAM`
 
