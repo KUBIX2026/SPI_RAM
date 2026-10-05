@@ -297,7 +297,7 @@ El paso a paso sería así:
 6. Finalización: El controlador conmuta CS a 1 para cerrar el ciclo de la memoria.
 7. Aviso a la CPU: El controlador limpia sus banderas internas y notifica a la CPU que la operación ha finalizado exitosamente (ready = 1).
 
-## Trama [IA Assisted]
+## Trama [IA asistido]
 
 Con base en la información especificada, la trama de datos hacia la memoria RAM, considerando el estándar del `MODO 0` (común en configuraciones de memoria) en el comando de lectura y escritura la trama se estructura así: 
 
