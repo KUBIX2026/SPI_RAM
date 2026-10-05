@@ -301,6 +301,35 @@ El paso a paso sería así:
 
 Con base en la estructura previamente especificada, la trama de datos que llega a la memoria RAM referenciada respecto a la señal se vería de la siguiente forma: 
 
+```mermaid
+architecture-beta
+```
+
+```mermaid
+packet-beta
+0-7: "CMD (0x03)"
+8-23: "Dirección (0x01A4)"
+24-31: "Dato Leído (RAM -> FPGA)"
+```
+
+```mermaid
+gantt
+    title Transacción de Lectura SPI RAM
+    dateFormat  X
+    axisFormat %s
+    section CS#
+    Activo (CS=0) : active, cs, 0, 32
+    section SCLK
+    Reloj Activo  : clk, 2, 30
+    section MOSI
+    Opcode (0x03) : mosi1, 2, 10
+    Dirección     : mosi2, 10, 26
+    section MISO
+    Dato Leído    : miso1, 26, 32
+```
+
+
+
 
 
 # Fuente: 
