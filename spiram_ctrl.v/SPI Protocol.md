@@ -297,6 +297,12 @@ El paso a paso sería así:
 6. Finalización: El controlador conmuta CS a 1 para cerrar el ciclo de la memoria.
 7. Aviso a la CPU: El controlador limpia sus banderas internas y notifica a la CPU que la operación ha finalizado exitosamente (ready = 1).
 
+## Trama
+
+Con base en la estructura previamente especificada, la trama de datos que llega a la memoria RAM referenciada respecto a la señal se vería de la siguiente forma: 
+
+
+
 # Fuente: 
 
 1. MCI Electronics. (2022, 23 de agosto). Serial Peripheral Interface (SPI). Cursos MCI Electronics. https://cursos.mcielectronics.cl/2022/08/23/serial-peripheral-interface-spi/
