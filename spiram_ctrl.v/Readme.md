@@ -76,7 +76,7 @@ flowchart TD
 
     DeassertCE --> SendAck[Generar señal ACK / Ready a la CPU]
     SendAck --> CheckTimer{¿Límite t_CEM excedido?<br>Burst mayor a 4 us}
-    CheckTimer -- Sí --> PauseCE[Mantener CE# en 1 V durante 50 ns<br>Permitir autorrefresco interno de PSRAM]
+    CheckTimer -- Sí --> PauseCE[Mantener CS# en 1 V durante 50 ns<br>Permitir autorrefresco interno de PSRAM]
     CheckTimer -- No --> Idle
     PauseCE --> Idle
 ```
