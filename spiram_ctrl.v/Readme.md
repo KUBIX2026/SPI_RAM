@@ -48,3 +48,100 @@ Un vistazo rápido de los datos presentes en los datasheets pero relevantes para
 
 Con base en la información presente en [Protocolo SPI](/SPI#20Protocol.md) se puede establecer el funcionamiento del flujo del proceso que debe realizar el controlador durante la comunicación con el procesador. 
 
+```mermaid
+flowchart TD
+    %% Estilos estándar de símbolos
+    classDef startEnd fill:#2d3748,stroke:#cbd5e0,stroke-width:2px,color:#fff;
+    classDef process fill:#1a202c,stroke:#4a5568,stroke-width:1px,color:#fff;
+    classDef decision fill:#2b6cb0,stroke:#63b3ed,stroke-width:1px,color:#fff;
+
+    %% --- FASE 1: INICIALIZACIÓN ---
+    Start([Inicio / Reset del Sistema]) :::startEnd --> InitMode[Configurar controlador en modo 1-bit SPI] :::process
+    InitMode --> SendEnableQPI[Transmitir comando de habilitación Quad-SPI '0x35' por SIO0] :::process
+    SendEnableQPI --> SetQPIFlag[Establecer bus interno en modo 4-bits / QPI] :::process
+    SetQPIFlag --> Idle[Estado IDLE: Esperar solicitud de la CPU<br>Líneas CE# en alto / SCLK = 0] :::process
+
+    %% --- FASE 2: ATENCIÓN A SOLICITUD DE CPU ---
+    Idle --> CheckReq{¿CPU solicita acceso?<br>req == 1} :::decision
+    CheckReq -- No --> Idle
+    CheckReq -- Sí --> LatchBus[Capturar bus de la CPU:<br>Dirección A[24:0], Datos y tipo de operación WE] :::process
+
+    %% --- FASE 3: SELECCIÓN Y DIRECCIONAMIENTO ---
+    LatchBus --> DecodeChip[Decodificar bits superiores A<br>Enviar SEL[1:0] al SN74HCS138] :::process
+    DecodeChip --> AssertCE[El SN74HCS138 baja la línea CE# a 0 V<br>de la memoria seleccionada] :::process
+    AssertCE --> SendOpcode[Enviar OpCode de operación por SIO[3:0]<br>'0x03' Lectura / '0x02' Escritura] :::process
+    SendOpcode --> SendAddr[Enviar dirección relativa de 23 bits A[22:0]<br>por el bus SIO[3:0]] :::process
+
+    %% --- FASE 4: TIPO DE OPERACIÓN ---
+    SendAddr --> CheckWE{¿Tipo de operación?} :::decision
+
+    %% --- RAMA DE ESCRITURA ---
+    CheckWE -- Escritura WE = 1 --> WriteData[Transferir n-bytes de datos<br>desde la CPU hacia la PSRAM por SIO[3:0]] :::process
+    WriteData --> DeassertCE[Levantar línea CE# a 1 V<br>Finalizar transacción en la memoria] :::process
+
+    %% --- RAMA DE LECTURA ---
+    CheckWE -- Lectura WE = 0 --> DummyCycles[Generar ciclos de reloj Dummy<br>Esperar recuperación analógica de la PSRAM] :::process
+    DummyCycles --> ReadData[Muestrear datos desde la PSRAM por SIO[3:0]<br>en cada flanco ascendente de SCLK] :::process
+    ReadData --> SendToCPU[Cargar dato en bus de entrada de la CPU] :::process
+    SendToCPU --> DeassertCE
+
+    %% --- FASE 5: FINALIZACIÓN ---
+    DeassertCE --> SendAck[Generar señal ACK / Ready a la CPU] :::process
+    SendAck --> CheckTimer{¿Límite t_CEM excedido?<br>Burst > 4 us} :::decision
+    CheckTimer -- Sí --> PauseCE[Mantener CE# en 1 V durante 50 ns<br>Permitir autorrefresco interno de PSRAM] :::process
+    CheckTimer -- No --> Idle
+    PauseCE --> Idle
+```
+
+# Diagrama de bloques
+
+Con base en la información presentada en el diagrama de flujo previo, se hace el diagrama de bloques correspondiente a dicho sistema. 
+
+```mermaid
+graph LR
+    subgraph CPU ["Procesador RISC"]
+        ADDR_BUS["Bus Dirección (A[31:0])"]
+        DATA_OUT["Bus Dato Salida"]
+        DATA_IN["Bus Dato Entrada"]
+        CTRL_BUS["Señales Control (WE / STB)"]
+    end
+
+    subgraph DECODER_SYS ["Decodificador CPU"]
+        ADDR_DEC["Address Decoder"]
+    end
+
+    subgraph CTRL_MODULE ["Controlador QSPI (Verilog en FPGA)"]
+        FSM["FSM Control & Clock Enable"]
+        DATA_REG["Shift Registers & Tri-State"]
+        ADDR_SPLIT["Divisor de Dirección"]
+    end
+
+    subgraph HARDWARE_EXT ["Componentes Externos"]
+        DECODER_138["SN74HCS138<br>(Decodificador 3:8)"]
+        RAM0["APS6404L (Chip 0)"]
+        RAM1["APS6404L (Chip 1)"]
+        RAM2["APS6404L (Chip 2)"]
+        RAM3["APS6404L (Chip 3)"]
+    end
+
+    %% Conexiones CPU a Decodificador de Sistema
+    ADDR_BUS --> ADDR_DEC
+    ADDR_DEC -- "Chip Select Controller (REQ)" --> FSM
+
+    %% Conexiones CPU a Controlador
+    ADDR_BUS --> ADDR_SPLIT
+    DATA_OUT --> DATA_REG
+    DATA_REG --> DATA_IN
+    CTRL_BUS --> FSM
+
+    %% Conexiones Controlador a Ext
+    ADDR_SPLIT -- "SEL[1:0]" --> DECODER_138
+    FSM -- "SCLK" --> RAM0 & RAM1 & RAM2 & RAM3
+    DATA_REG == "Bus Datos Quad SIO[3:0]" ==> RAM0 & RAM1 & RAM2 & RAM3
+
+    %% Conexiones Decodificador '138 a RAMs
+    DECODER_138 -- "CE0#" --> RAM0
+    DECODER_138 -- "CE1#" --> RAM1
+    DECODER_138 -- "CE2#" --> RAM2
+    DECODER_138 -- "CE3#" --> RAM3
+```
