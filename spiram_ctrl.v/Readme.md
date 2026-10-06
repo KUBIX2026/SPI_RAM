@@ -87,49 +87,56 @@ Con base en la información presentada en el diagrama de flujo previo, se hace e
 
 ```mermaid
 graph LR
-    subgraph CPU ["Procesador RISC"]
-        ADDR_BUS["Bus Dirección (A[31:0])"]
-        DATA_OUT["Bus Dato Salida"]
-        DATA_IN["Bus Dato Entrada"]
-        CTRL_BUS["Señales Control (WE / STB)"]
+    subgraph CPU [Procesador RISC]
+        ADDR_BUS[Bus de Direccion 32 bits]
+        DATA_OUT[Bus de Datos Salida]
+        DATA_IN[Bus de Datos Entrada]
+        CTRL_BUS[Senales de Control WE y STB]
     end
 
-    subgraph DECODER_SYS ["Decodificador CPU"]
-        ADDR_DEC["Address Decoder"]
+    subgraph DECODER_SYS [Decodificador del Sistema]
+        ADDR_DEC[Address Decoder CPU]
     end
 
-    subgraph CTRL_MODULE ["Controlador QSPI (Verilog en FPGA)"]
-        FSM["FSM Control & Clock Enable"]
-        DATA_REG["Shift Registers & Tri-State"]
-        ADDR_SPLIT["Divisor de Dirección"]
+    subgraph CTRL_MODULE [Controlador QSPI Verilog en FPGA]
+        FSM[FSM Control y Clock Enable]
+        DATA_REG[Shift Registers y Tri-State]
+        ADDR_SPLIT[Divisor de Direcciones A24-A0]
     end
 
-    subgraph HARDWARE_EXT ["Componentes Externos"]
-        DECODER_138["SN74HCS138<br>(Decodificador 3:8)"]
-        RAM0["APS6404L (Chip 0)"]
-        RAM1["APS6404L (Chip 1)"]
-        RAM2["APS6404L (Chip 2)"]
-        RAM3["APS6404L (Chip 3)"]
+    subgraph HARDWARE_EXT [Componentes Externos en Tarjeta]
+        DECODER_138[SN74HCS138 Decodificador 3 a 8]
+        RAM0[APS6404L Chip 0 de 8MB]
+        RAM1[APS6404L Chip 1 de 8MB]
+        RAM2[APS6404L Chip 2 de 8MB]
+        RAM3[APS6404L Chip 3 de 8MB]
     end
 
-    %% Conexiones CPU a Decodificador de Sistema
+    %% Conexiones CPU hacia Decodificador de Direcciones
     ADDR_BUS --> ADDR_DEC
-    ADDR_DEC -- "Chip Select Controller (REQ)" --> FSM
+    ADDR_DEC -- Seleccion de Controlador REQ --> FSM
 
-    %% Conexiones CPU a Controlador
+    %% Conexiones CPU hacia Controlador
     ADDR_BUS --> ADDR_SPLIT
     DATA_OUT --> DATA_REG
     DATA_REG --> DATA_IN
     CTRL_BUS --> FSM
 
-    %% Conexiones Controlador a Ext
-    ADDR_SPLIT -- "SEL[1:0]" --> DECODER_138
-    FSM -- "SCLK" --> RAM0 & RAM1 & RAM2 & RAM3
-    DATA_REG == "Bus Datos Quad SIO[3:0]" ==> RAM0 & RAM1 & RAM2 & RAM3
+    %% Conexiones internas y hacia externos desde el Controlador
+    ADDR_SPLIT -- Seleccion de Chip SEL 2 bits --> DECODER_138
+    FSM -- Reloj SCLK --> RAM0
+    FSM -- Reloj SCLK --> RAM1
+    FSM -- Reloj SCLK --> RAM2
+    FSM -- Reloj SCLK --> RAM3
 
-    %% Conexiones Decodificador '138 a RAMs
-    DECODER_138 -- "CE0#" --> RAM0
-    DECODER_138 -- "CE1#" --> RAM1
-    DECODER_138 -- "CE2#" --> RAM2
-    DECODER_138 -- "CE3#" --> RAM3
+    DATA_REG <== Bus Quad SIO 4 bits ==> RAM0
+    DATA_REG <== Bus Quad SIO 4 bits ==> RAM1
+    DATA_REG <== Bus Quad SIO 4 bits ==> RAM2
+    DATA_REG <== Bus Quad SIO 4 bits ==> RAM3
+
+    %% Habilitaciones desde Decodificador SN74HCS138 a cada Memoria
+    DECODER_138 -- Habilitacion CE0# --> RAM0
+    DECODER_138 -- Habilitacion CE1# --> RAM1
+    DECODER_138 -- Habilitacion CE2# --> RAM2
+    DECODER_138 -- Habilitacion CE3# --> RAM3
 ```
