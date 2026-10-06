@@ -60,14 +60,14 @@ flowchart TD
     CheckReq -- Sí --> LatchBus[Capturar bus de la CPU:<br>Dirección A de 25 bits, Datos y WE]
 
     LatchBus --> DecodeChip[Decodificar bits superiores A24-A23<br>Enviar SEL a entradas de SN74HCS138]
-    DecodeChip --> AssertCE[El SN74HCS138 baja la línea CE# a 0 V<br>de la memoria seleccionada]
+    DecodeChip --> AssertCE[El SN74HCS138 baja la línea CS# a 0 V<br>de la memoria seleccionada]
     AssertCE --> SendOpcode[Enviar OpCode de operación por bus Quad SIO<br>0x03 Lectura / 0x02 Escritura]
     SendOpcode --> SendAddr[Enviar dirección relativa de 23 bits A22-A0<br>por el bus Quad SIO]
 
     SendAddr --> CheckWE{¿Tipo de operación?}
 
     CheckWE -- Escritura WE = 1 --> WriteData[Transferir n-bytes de datos<br>desde CPU hacia PSRAM por bus SIO]
-    WriteData --> DeassertCE[Levantar línea CE# a 1 V<br>Finalizar transacción en memoria]
+    WriteData --> DeassertCE[Levantar línea CS# a 1 V<br>Finalizar transacción en memoria]
 
     CheckWE -- Lectura WE = 0 --> DummyCycles[Generar ciclos de reloj Dummy<br>Esperar recuperación analógica de PSRAM]
     DummyCycles --> ReadData[Muestrear datos desde PSRAM por bus SIO<br>en cada flanco ascendente de SCLK]
@@ -81,7 +81,17 @@ flowchart TD
     PauseCE --> Idle
 ```
 
-# Diagrama de bloques
+1. **Óvalos (`Inicio / Reset`):** Indican el arranque del hardware desde que la FPGA recibe alimentación o una señal de reset.
+2. **Rectángulos (`Procesos`):**
+   * **`Configurar / Transmitir QPI`:** Ocurren una sola vez al encender el sistema para pasar las memorias a modo de 4 bits.
+   * **`Decodificar bits A[24:23]`:** Transforma la dirección de la CPU en las señales `SEL[1:0]` que van hacia el `SN74HCS138`.
+   * **`El SN74HCS138 baja la línea CS#`:** Habilita el chip de memoria correcto *antes* de enviar la dirección y los datos.
+3. **Rombos (`Decisiones`):**
+   * **`¿CPU solicita acceso?`:** Evalúa si la CPU colocó una dirección válida asignada a la RAM.
+   * **`¿Tipo de operación?`:** Divide el camino entre el ciclo de escritura directa o el ciclo de lectura (que requiere *Dummy Cycles* de espera antes de capturar el dato).
+   * **`¿Límite t_CEM excedido?`:** Verifica si la transferencia fue demasiado larga para liberar `CE#` y permitir que la memoria se autorrefresque.
+
+# Diagrama de bloques [IA sugerido. Sujeto a revisión]
 
 Con base en la información presentada en el diagrama de flujo previo, se hace el diagrama de bloques correspondiente a dicho sistema. 
 
