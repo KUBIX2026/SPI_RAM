@@ -13,9 +13,11 @@ En este sistema la memoria `RAM` va a trabajar como almacenador de información 
 2. La memoria `RAM` es un dispositivo externo y no es parte de la `FPGA`, sin embargo, el controlador que se desarrolla sí está en la `FPGA`. Se hace necesaria la aclaración para denotar que existen dos dominios; `BUS LOCAL` (lado `CPU`) que trabaja con el reloj del sistema generado por el oscilador de cristal y `BUS EXTERNO` (lado periféricos) que trabaja con un reloj independiente comandado por el protocolo -`SPI` en nuestro caso- con base en la capacidad del periférico en cuestión.
 3. El dispositivo que se va a usar consiste en una `RAM` `QUAD-SPI` (para más información respecto a cómo funciona esto remitirse a [Protocolo SPI](/SPI%20Protocol.md). Consiste en un chip [`HCS138`](../Datasheets/SN74HCS138.pdf) (05EG3/M8K3) y 4 memorias [`APS6404L-3SQ`](../Datasheets/APS6404L-3SQR.pdf).
 
-Alguna información relevante respecto a cada dispositivo se muestra a continuación: 
+## Especificaciones Técnicas
 
-### Especificaciones Técnicas de los Componentes de Memoria
+Un vistazo rápido de los datos presentes en los datasheets pero relevantes para el controlador se muestran en las tablas. 
+
+### Componentes de Memoria
 
 | Componente | Parámetro Técnico | Valor / Especificación | Relevancia para el Controlador Verilog / FPGA |
 | :--- | :--- | :--- | :--- |
@@ -32,7 +34,7 @@ Alguna información relevante respecto a cada dispositivo se muestra a continuac
 
 ---
 
-### Mapeo de Selección de Chip (Decodificador `SN74HCS138`)
+## Mapeo de Selección de Chip (Decodificador `SN74HCS138`)
 
 | Selección Verilog (`SEL[1:0]`) | Salida Activa `SN74HCS138` | Memoria Habilitada | Rango de Direcciones Hexadecimal ($32\text{ MB}$ Total) |
 | :---: | :---: | :---: | :---: |
@@ -40,3 +42,9 @@ Alguna información relevante respecto a cada dispositivo se muestra a continuac
 | `2'b01` | $Y_1$ (`0V` / Bajo) | `APS6404L` Chip 1 ($8\text{ MB}$) | `0x0080_0000` — `0x00FF_FFFF`  |
 | `2'b10` | $Y_2$ (`0V` / Bajo) | `APS6404L` Chip 2 ($8\text{ MB}$) | `0x0100_0000` — `0x017F_FFFF`  |
 | `2'b11` | $Y_3$ (`0V` / Bajo) | `APS6404L` Chip 3 ($8\text{ MB}$) | `0x0180_0000` — `0x01FF_FFFF`  |
+
+
+# Diagrama de flujo 
+
+Con base en la información presente en [Protocolo SPI](/SPI#20Protocol.md) se puede establecer el funcionamiento del flujo del proceso que debe realizar el controlador durante la comunicación con el procesador. 
+
