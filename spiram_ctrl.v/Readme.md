@@ -7,7 +7,7 @@ Este espacio está reservado para la especificación de la información relevant
 Con base en esta imagen se puede determinar el tipo de módulo con el que se va a trabajar, y en consecuencia, empezar la creación de su diagrama.
 En este sistema la memoria `RAM` va a trabajar como almacenador de información referente a variables de ejecución de algún programa. 
 
-# Cosas a considerar. 
+# Consideraciones. 
 
 1. La información relevante del protocolo se encuentra en [Protocolo SPI](../spiram_ctrl.v/SPI%20Protocol.md)
 2. La memoria `RAM` es un dispositivo externo y no es parte de la `FPGA`, sin embargo, el controlador que se desarrolla sí está en la `FPGA`. Se hace necesaria la aclaración para denotar que existen dos dominios; `BUS LOCAL` (lado `CPU`) que trabaja con el reloj del sistema generado por el oscilador de cristal y `BUS EXTERNO` (lado periféricos) que trabaja con un reloj independiente comandado por el protocolo -`SPI` en nuestro caso- con base en la capacidad del periférico en cuestión.
@@ -46,7 +46,7 @@ Un vistazo rápido de los datos presentes en los datasheets pero relevantes para
 
 # Diagrama de flujo 
 
-Con base en la información presente en [Protocolo SPI](/SPI#20Protocol.md) se puede establecer el funcionamiento del flujo del proceso que debe realizar el controlador durante la comunicación con el procesador. 
+Con base en la información presente en [Protocolo SPI](/SPI#20Protocol.md) y referenciando el hardware disponible se puede establecer el flujo del proceso que debe realizar el controlador durante la comunicación con la `CPU` y la `RAM`.
 
 ```mermaid
 flowchart TD
