@@ -43,6 +43,10 @@ Un vistazo rápido de los datos presentes en los datasheets pero relevantes para
 | `2'b10` | $Y_2$ (`0V` / Bajo) | `APS6404L` Chip 2 ($8\text{ MB}$) | `0x0100_0000` — `0x017F_FFFF`  |
 | `2'b11` | $Y_3$ (`0V` / Bajo) | `APS6404L` Chip 3 ($8\text{ MB}$) | `0x0180_0000` — `0x01FF_FFFF`  |
 
+## Mapeo físico del periférico
+
+-Estamos trabajando en ello, el mapa se actualizará tan pronto como se confirmen las conexiones por ingeniería inversa-
+
 
 # Diagrama de flujo 
 
