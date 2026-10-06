@@ -1,10 +1,13 @@
 # SPIRAM_CTRL.V
 
-This space is set for specifications on assigned SPIRAM control module within console logic functioning. 
+Este espacio está reservado para la especificación de la información relevante del funcionamiento de la memoria RAM mediante protocolo `SPI`. 
 
 ![RAM Type Differentiation](../Images/RAM%20type%20description.png)
 
-Based on this image we can figure out what kind of module we are working with, so by committing to this description we can start creating the logic flowchart for this device. 
-Please note that this works through **SPI protocol**.
+Con base en esta imagen se puede determinar el tipo de módulo con el que se va a trabajar, y en consecuencia, empezar la creación de su diagrama.
+En este sistema la memoria `RAM` va a trabajar como almacenador de información referente a variables de ejecución de algún programa. 
 
-There are 2 types of RAM memories that will be used. One through SPI protocol called SPI_RAM and the other one that works as b_ram which is parallel to the processor, thus, high speed which has no protocol. During the functioning of the system there are 2 types of data that will be requested from these memories, which one will depend on the scenario in question. 
+# Cosas a considerar. 
+
+1. La memoria `RAM` es un dispositivo externo y no es parte de la `FPGA`, sin embargo, el controlador que se desarrolla sí está en la `FPGA`. Se hace necesaria la aclaración para denotar que existen dos dominios; `BUS LOCAL` (lado `CPU`) que trabaja con el reloj del sistema generado por el oscilador de cristal y `BUS EXTERNO` (lado periféricos) que trabaja con un reloj independiente comandado por el protocolo -`SPI` en nuestro caso- y según lo que soporte el periférico en cuestión.
+2. El dispositivo que se va a usar consiste en una RAM QUADSPI. Consiste en un chip `HCS138` (05EG3/M8K3) y 4 memorias APS6404L-3SQR.
