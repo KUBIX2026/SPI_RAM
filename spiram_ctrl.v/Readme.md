@@ -50,45 +50,40 @@ Con base en la información presente en [Protocolo SPI](/SPI#20Protocol.md) se p
 
 ```mermaid
 flowchart TD
-    %% Estilos estándar de símbolos
-    classDef startEnd fill:#2d3748,stroke:#cbd5e0,stroke-width:2px,color:#fff;
-    classDef process fill:#1a202c,stroke:#4a5568,stroke-width:1px,color:#fff;
-    classDef decision fill:#2b6cb0,stroke:#63b3ed,stroke-width:1px,color:#fff;
-
     %% --- FASE 1: INICIALIZACIÓN ---
-    Start([Inicio / Reset del Sistema]) :::startEnd --> InitMode[Configurar controlador en modo 1-bit SPI] :::process
-    InitMode --> SendEnableQPI[Transmitir comando de habilitación Quad-SPI '0x35' por SIO0] :::process
-    SendEnableQPI --> SetQPIFlag[Establecer bus interno en modo 4-bits / QPI] :::process
-    SetQPIFlag --> Idle[Estado IDLE: Esperar solicitud de la CPU<br>Líneas CE# en alto / SCLK = 0] :::process
+    Start([Inicio / Reset del Sistema]) --> InitMode[Configurar controlador en modo 1-bit SPI]
+    InitMode --> SendEnableQPI[Transmitir comando de habilitación Quad-SPI 0x35 por SIO0]
+    SendEnableQPI --> SetQPIFlag[Establecer bus interno en modo 4-bits / QPI]
+    SetQPIFlag --> Idle[Estado IDLE: Esperar solicitud de la CPU<br>Líneas CE# en alto / SCLK = 0]
 
     %% --- FASE 2: ATENCIÓN A SOLICITUD DE CPU ---
-    Idle --> CheckReq{¿CPU solicita acceso?<br>req == 1} :::decision
+    Idle --> CheckReq{¿CPU solicita acceso?<br>req == 1}
     CheckReq -- No --> Idle
-    CheckReq -- Sí --> LatchBus[Capturar bus de la CPU:<br>Dirección A[24:0], Datos y tipo de operación WE] :::process
+    CheckReq -- Sí --> LatchBus[Capturar bus de la CPU:<br>Dirección A[24:0], Datos y WE]
 
     %% --- FASE 3: SELECCIÓN Y DIRECCIONAMIENTO ---
-    LatchBus --> DecodeChip[Decodificar bits superiores A<br>Enviar SEL[1:0] al SN74HCS138] :::process
-    DecodeChip --> AssertCE[El SN74HCS138 baja la línea CE# a 0 V<br>de la memoria seleccionada] :::process
-    AssertCE --> SendOpcode[Enviar OpCode de operación por SIO[3:0]<br>'0x03' Lectura / '0x02' Escritura] :::process
-    SendOpcode --> SendAddr[Enviar dirección relativa de 23 bits A[22:0]<br>por el bus SIO[3:0]] :::process
+    LatchBus --> DecodeChip[Decodificar bits superiores A<br>Enviar SEL[1:0] al SN74HCS138]
+    DecodeChip --> AssertCE[El SN74HCS138 baja la línea CE# a 0 V<br>de la memoria seleccionada]
+    AssertCE --> SendOpcode[Enviar OpCode de operación por SIO[3:0]<br>0x03 Lectura / 0x02 Escritura]
+    SendOpcode --> SendAddr[Enviar dirección relativa de 23 bits A[22:0]<br>por el bus SIO[3:0]]
 
     %% --- FASE 4: TIPO DE OPERACIÓN ---
-    SendAddr --> CheckWE{¿Tipo de operación?} :::decision
+    SendAddr --> CheckWE{¿Tipo de operación?}
 
-    %% --- RAMA DE ESCRITURA ---
-    CheckWE -- Escritura WE = 1 --> WriteData[Transferir n-bytes de datos<br>desde la CPU hacia la PSRAM por SIO[3:0]] :::process
-    WriteData --> DeassertCE[Levantar línea CE# a 1 V<br>Finalizar transacción en la memoria] :::process
+    %% RAMA DE ESCRITURA
+    CheckWE -- Escritura WE = 1 --> WriteData[Transferir n-bytes de datos<br>desde CPU hacia PSRAM por SIO[3:0]]
+    WriteData --> DeassertCE[Levantar línea CE# a 1 V<br>Finalizar transacción en memoria]
 
-    %% --- RAMA DE LECTURA ---
-    CheckWE -- Lectura WE = 0 --> DummyCycles[Generar ciclos de reloj Dummy<br>Esperar recuperación analógica de la PSRAM] :::process
-    DummyCycles --> ReadData[Muestrear datos desde la PSRAM por SIO[3:0]<br>en cada flanco ascendente de SCLK] :::process
-    ReadData --> SendToCPU[Cargar dato en bus de entrada de la CPU] :::process
+    %% RAMA DE LECTURA
+    CheckWE -- Lectura WE = 0 --> DummyCycles[Generar ciclos de reloj Dummy<br>Esperar recuperación analógica de PSRAM]
+    DummyCycles --> ReadData[Muestrear datos desde PSRAM por SIO[3:0]<br>en cada flanco ascendente de SCLK]
+    ReadData --> SendToCPU[Cargar dato en bus de entrada de la CPU]
     SendToCPU --> DeassertCE
 
     %% --- FASE 5: FINALIZACIÓN ---
-    DeassertCE --> SendAck[Generar señal ACK / Ready a la CPU] :::process
-    SendAck --> CheckTimer{¿Límite t_CEM excedido?<br>Burst > 4 us} :::decision
-    CheckTimer -- Sí --> PauseCE[Mantener CE# en 1 V durante 50 ns<br>Permitir autorrefresco interno de PSRAM] :::process
+    DeassertCE --> SendAck[Generar señal ACK / Ready a la CPU]
+    SendAck --> CheckTimer{¿Límite t_CEM excedido?<br>Burst > 4 us}
+    CheckTimer -- Sí --> PauseCE[Mantener CE# en 1 V durante 50 ns<br>Permitir autorrefresco interno de PSRAM]
     CheckTimer -- No --> Idle
     PauseCE --> Idle
 ```
