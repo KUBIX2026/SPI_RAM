@@ -48,7 +48,7 @@ Un vistazo rápido de los datos presentes en los datasheets pero relevantes para
 -Estamos trabajando en ello, el mapa se actualizará tan pronto como se confirmen las conexiones por ingeniería inversa-
 
 
-# Diagrama de flujo 
+# Diagrama de flujo [IA asistido]
 
 Con base en la información presente en [Protocolo SPI](/SPI#20Protocol.md) y referenciando el hardware disponible se puede establecer el flujo del proceso que debe realizar el controlador durante la comunicación con la `CPU` y la `RAM`.
 
