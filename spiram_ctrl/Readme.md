@@ -1,4 +1,4 @@
-# SPIRAM_CTRL.V
+# SPIRAM_CTRL
 
 Este espacio está reservado para la especificación de la información relevante del funcionamiento de la memoria RAM mediante protocolo `SPI`. 
 
