@@ -95,7 +95,7 @@ flowchart TD
    * **`¿Tipo de operación?`:** Divide el camino entre el ciclo de escritura directa o el ciclo de lectura (que requiere *Dummy Cycles* de espera antes de capturar el dato).
    * **`¿Límite t_CEM excedido?`:** Verifica si la transferencia fue demasiado larga para liberar `CE#` y permitir que la memoria se autorrefresque.
 
-# Diagrama de bloques [IA sugerido. Sujeto a revisión]
+# Diagrama de bloques [IA asistido. Sujeto a revisión]
 
 Con base en la información presentada en el diagrama de flujo previo, se hace el diagrama de bloques correspondiente a dicho sistema. 
 
