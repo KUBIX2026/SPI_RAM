@@ -233,7 +233,7 @@ always @(posedge clk or posedge reset) begin
     end
 end
 ```
-De forma visual, eso se vería así: 
+De forma visual, eso sería así: 
 
 * Algoritmo 1: Operación de escritura
 
