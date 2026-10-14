@@ -97,6 +97,7 @@ flowchart TD
   
 ## Diagramas de funciones 
 
+```mermaid
 flowchart TD
     Start([Entrada: Señal RESET = 0 / Salida de Reset]) --> Step1[Inicializar contadores internos y flags<br>qpi_enabled <= 0]
     Step1 --> Step2[Esperar tiempo de estabilización tPU<br>Garantizar alimentación estable en PSRAM]
@@ -107,6 +108,7 @@ flowchart TD
     Step6 --> Step7[Levantar líneas CE# a 3.3 V<br>Completar ciclo de comando en las memorias]
     Step7 --> Step8[Establecer bandera interna qpi_enabled <= 1<br>Reconfigurar buffers SIO a 4-bits bidireccionales]
     Step8 --> End([Fin de Inicialización: Transición a IDLE])
+```
 
 # Diagrama de bloques [IA asistido. Sujeto a revisión]
 
