@@ -94,6 +94,19 @@ flowchart TD
    * **`¿CPU solicita acceso?`:** Evalúa si la CPU colocó una dirección válida asignada a la RAM.
    * **`¿Tipo de operación?`:** Divide el camino entre el ciclo de escritura directa o el ciclo de lectura (que requiere *Dummy Cycles* de espera antes de capturar el dato).
    * **`¿Límite t_CEM excedido?`:** Verifica si la transferencia fue demasiado larga para liberar `CE#` y permitir que la memoria se autorrefresque.
+  
+## Diagramas de funciones 
+
+flowchart TD
+    Start([Entrada: Señal RESET = 0 / Salida de Reset]) --> Step1[Inicializar contadores internos y flags<br>qpi_enabled <= 0]
+    Step1 --> Step2[Esperar tiempo de estabilización tPU<br>Garantizar alimentación estable en PSRAM]
+    Step2 --> Step3[Configurar buffers SIO:<br>SIO0 como Salida MOSI / SIO1 como Entrada MISO<br>SIO2 y SIO3 en alta impedancia o nivel alto]
+    Step3 --> Step4[Bajar líneas CE# a 0 V de las PSRAM]
+    Step4 --> Step5[Cargar opcode de configuración 0x35<br>en el registro de desplazamiento]
+    Step5 --> Step6[Generar 8 ciclos de SCLK<br>Transmitir 0x35 bit a bit por SIO0]
+    Step6 --> Step7[Levantar líneas CE# a 3.3 V<br>Completar ciclo de comando en las memorias]
+    Step7 --> Step8[Establecer bandera interna qpi_enabled <= 1<br>Reconfigurar buffers SIO a 4-bits bidireccionales]
+    Step8 --> End([Fin de Inicialización: Transición a IDLE])
 
 # Diagrama de bloques [IA asistido. Sujeto a revisión]
 
