@@ -62,7 +62,7 @@ Para garantizar consistencia visual y facilitar la lectura técnica de los diagr
 | **Puntos de Decisión** | `#2B6CB0` | 🟦 | Resalta las evaluaciones de condiciones lógicas y bifurcaciones de control (`req == 1`, `WE == 1`, `t_CEM > 4us`). |
 | **Acciones del Bus SIO / Protocolo** | `#276749` | 🟩 | Identifica la transmisión activa de comandos, direcciones o datos hacia/desde las PSRAM (`0x35`, `0x03`, `0x02`). |
 | **Control Interno y Registros** | `#1A202C` | ⬛ | Indica operaciones internas de la FPGA, como registro de buses, decodificación para `SEL[1:0]` o manejo de $CS\#$. |
-| **Pausas de Seguridad / Alertas** | `#C05621` | 🟧 | Reservado exclusivamente para la interrupción de $t_{\text{CEM}}$ (pausa de $50\text{ ns}$ para autorrefresco de memoria). |
+| **Pausas de Seguridad / Alertas** | `#C05621` | 🟧 | Reservado exclusivamente para la interrupción de t_CEM (pausa de 50ns para autorrefresco de memoria). |
 
 ```mermaid
 flowchart TD
