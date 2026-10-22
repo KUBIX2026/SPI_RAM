@@ -64,7 +64,9 @@ Para garantizar consistencia visual y facilitar la lectura técnica de los diagr
 | **Control Interno y Registros** | `#1A202C` | ⬛ | Indica operaciones internas de la FPGA, como registro de buses, decodificación para `SEL[1:0]` o manejo de $CS$\#. |
 | **Pausas de Seguridad / Alertas** | `#C05621` | 🟧 | Reservado exclusivamente para la interrupción de $t_{\text{CEM}}$ (pausa de $50\text{ ns}$ para autorrefresco de memoria). |
 
-![SPI_RAM](../Images/SPI_RAM.svg)
+<p align="center">
+  <img src="../Images/SPI_RAM.svg" alt="SPI_RAM">
+</p>
 
 ```mermaid
 flowchart TD
@@ -111,9 +113,26 @@ flowchart TD
   
 ## Diagramas de funciones 
 
-![Configurar controlador en modo 1-bit SPI](../Images/Configurar%20controlador%20en%20modo%201-bit%20SPI.svg)
-![Establecer bus interno en modo 4-bits _ QPI](../Images/Establecer%20bus%20interno%20en%20modo%204-bits%20_%20QPI.svg)
-![Transmitir comando de habilitación Quad-SPI 0x35 por SIO0](../Images/Transmitir%20comando%20de%20habilitación%20Quad-SPI%200x35%20por%20SIO0.svg)
+Puesto que algunas de las funciones requieren de explicación adicional respecto a lo que se indica en el diagrama principal, las versiones ampliadas (con misma codificación de colores) se muestran a continuación).
+
+### Configuración 1-bit SPI
+
+<p align="center">
+  <img src="../Images/Configurar%20controlador%20en%20modo%201-bit%20SPI.svg" alt="Configurar controlador en modo 1-bit SPI">
+</p>
+
+### Transmisión comando habilitación Q-SPI
+
+<p align="center">
+  <img src="../Images/Transmitir%20comando%20de%20habilitación%20Quad-SPI%200x35%20por%20SIO0.svg" alt="Transmitir comando de habilitación Quad-SPI 0x35 por SIO0">
+</p>
+
+### Configuración bus interno a 4-bit SPI
+
+<p align="center">
+  <img src="../Images/Establecer%20bus%20interno%20en%20modo%204-bits%20_%20QPI.svg" alt="Establecer bus interno en modo 4-bits _ QPI">
+</p>
+
 
 # Diagrama de bloques [IA asistido. Sujeto a revisión]
 
