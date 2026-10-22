@@ -64,6 +64,8 @@ Para garantizar consistencia visual y facilitar la lectura técnica de los diagr
 | **Control Interno y Registros** | `#1A202C` | ⬛ | Indica operaciones internas de la FPGA, como registro de buses, decodificación para `SEL[1:0]` o manejo de $CS$\#. |
 | **Pausas de Seguridad / Alertas** | `#C05621` | 🟧 | Reservado exclusivamente para la interrupción de $t_{\text{CEM}}$ (pausa de $50\text{ ns}$ para autorrefresco de memoria). |
 
+![SPI_RAM](../Images/SPI_RAM.svg)
+
 ```mermaid
 flowchart TD
     Start([Inicio / Reset del Sistema]) --> InitMode[Configurar controlador en modo 1-bit SPI]
@@ -109,18 +111,9 @@ flowchart TD
   
 ## Diagramas de funciones 
 
-```mermaid
-flowchart TD
-    Start([Entrada: Señal RESET = 0 / Salida de Reset]) --> Step1[Inicializar contadores internos y flags<br>qpi_enabled <= 0]
-    Step1 --> Step2[Esperar tiempo de estabilización tPU<br>Garantizar alimentación estable en PSRAM]
-    Step2 --> Step3[Configurar buffers SIO:<br>SIO0 como Salida MOSI / SIO1 como Entrada MISO<br>SIO2 y SIO3 en alta impedancia o nivel alto]
-    Step3 --> Step4[Bajar líneas CE# a 0 V de las PSRAM]
-    Step4 --> Step5[Cargar opcode de configuración 0x35<br>en el registro de desplazamiento]
-    Step5 --> Step6[Generar 8 ciclos de SCLK<br>Transmitir 0x35 bit a bit por SIO0]
-    Step6 --> Step7[Levantar líneas CE# a 3.3 V<br>Completar ciclo de comando en las memorias]
-    Step7 --> Step8[Establecer bandera interna qpi_enabled <= 1<br>Reconfigurar buffers SIO a 4-bits bidireccionales]
-    Step8 --> End([Fin de Inicialización: Transición a IDLE])
-```
+![Configurar controlador en modo 1-bit SPI](../Images/Configurar%20controlador%20en%20modo%201-bit%20SPI.svg)
+![Establecer bus interno en modo 4-bits _ QPI](../Images/Establecer%20bus%20interno%20en%20modo%204-bits%20_%20QPI.svg)
+![Transmitir comando de habilitación Quad-SPI 0x35 por SIO0](../Images/Transmitir%20comando%20de%20habilitación%20Quad-SPI%200x35%20por%20SIO0.svg)
 
 # Diagrama de bloques [IA asistido. Sujeto a revisión]
 
