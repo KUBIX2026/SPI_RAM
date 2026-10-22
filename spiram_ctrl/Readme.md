@@ -52,7 +52,7 @@ Un vistazo rápido de los datos presentes en los datasheets pero relevantes para
 
 Con base en la información presente en [Protocolo SPI](/SPI#20Protocol.md) y referenciando el hardware disponible se puede establecer el flujo del proceso que debe realizar el controlador durante la comunicación con la `CPU` y la `RAM`.
 
-## 🎨 Especificación del Código de Colores para Diagramas
+## 🎨 Especificación del Código de Colores para Diagramas (Draw.io)
 
 Para garantizar consistencia visual y facilitar la lectura técnica de los diagramas de flujo del controlador QSPI, se aplica la siguiente paleta semántica según el tipo y función de cada bloque:
 
@@ -61,8 +61,8 @@ Para garantizar consistencia visual y facilitar la lectura técnica de los diagr
 | **Inicio / Fin de Flujo** | `#2D3748` | ⬛ | Delimita los puntos de entrada y salida de las funciones, rutinas o sub-diagramas. |
 | **Puntos de Decisión** | `#2B6CB0` | 🟦 | Resalta las evaluaciones de condiciones lógicas y bifurcaciones de control (`req == 1`, `WE == 1`, `t_CEM > 4us`). |
 | **Acciones del Bus SIO / Protocolo** | `#276749` | 🟩 | Identifica la transmisión activa de comandos, direcciones o datos hacia/desde las PSRAM (`0x35`, `0x03`, `0x02`). |
-| **Control Interno y Registros** | `#1A202C` | ⬛ | Indica operaciones internas de la FPGA, como registro de buses, decodificación para `SEL[1:0]` o manejo de $CS\#$. |
-| **Pausas de Seguridad / Alertas** | `#C05621` | 🟧 | Reservado exclusivamente para la interrupción de t_CEM (pausa de 50ns para autorrefresco de memoria). |
+| **Control Interno y Registros** | `#1A202C` | ⬛ | Indica operaciones internas de la FPGA, como registro de buses, decodificación para `SEL[1:0]` o manejo de $CS$\#. |
+| **Pausas de Seguridad / Alertas** | `#C05621` | 🟧 | Reservado exclusivamente para la interrupción de $t_{\text{CEM}}$ (pausa de $50\text{ ns}$ para autorrefresco de memoria). |
 
 ```mermaid
 flowchart TD
