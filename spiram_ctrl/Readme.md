@@ -226,7 +226,7 @@ Con el diagrama de bloques previo y la representación general de las conexiones
 
 A continuación se detalla la nomenclatura asignada a cada una de las líneas y buses de Entrada/Salida que componen la interfaz externa del controlador QSPI, agrupadas por su dominio funcional:
 
-### 1. Interfaz con el Procesador (Dominio CPU)
+## 1. Interfaz con el Procesador (Dominio CPU)
 | Nombre de Señal | Tipo / Ancho | Dirección | Descripción Funcional |
 | :--- | :---: | :---: | :--- |
 | `clk_i` | 1 bit | Entrada | Reloj maestro del sistema (proveniente de la FPGA). |
@@ -238,16 +238,39 @@ A continuación se detalla la nomenclatura asignada a cada una de las líneas y 
 | `req_i` | 1 bit | Entrada | Bandera de solicitud de acceso (*Strobe* o petición activa de la CPU). |
 | `ack_o` | 1 bit | Salida | Señal de reconocimiento o listo (*Ready/ACK*) para indicar fin de transacción a la CPU. |
 
-### 2. Interfaz con el Decodificador y Selección (Dominio de Direccionamiento)
+## 2. Interfaz con el Decodificador y Selección (Dominio de Direccionamiento)
 | Nombre de Señal | Tipo / Ancho | Dirección | Descripción Funcional |
 | :--- | :---: | :---: | :--- |
 | `sel_o` | 2 bits `[1:0]` | Salida | Bits superiores de dirección ($A[24:23]$) conectados a las entradas de selección del `SN74HCS138`. |
 | `ce_n_o` | Líneas de habilitación | Salida | Líneas de selección de chip activas en bajo (`CS#`) habilitadas hacia el banco de memorias PSRAM. |
 
-### 3. Interfaz con las Memorias Físicas (Dominio PSRAM)
+## 3. Interfaz con las Memorias Físicas (Dominio PSRAM)
 | Nombre de Señal | Tipo / Ancho | Dirección | Descripción Funcional |
 | :--- | :---: | :---: | :--- |
 | `sclk_o` | 1 bit | Salida | Señal de reloj serial generada por el controlador para sincronizar la comunicación con la PSRAM. |
 | `sio_io` | 4 bits `[3:0]` | Bidireccional | Bus Quad SIO (`SIO0`, `SIO1`, `SIO2`, `SIO3`) para la transferencia multiplexada de comandos, direcciones y datos. |
 
+Haciendo un desarrollo más avanzado del diagrama de bloques del controlador, se dividen dos subsistemas principales encargados de la mayor parte del proceso y otro bloque adicional encargado de verificar las direcciones. 
 
+<p align="center">
+  <img src="../Images/Expanded_Box.svg" alt="Expanded Blackbox spiram_ctrl">
+</p>
+
+## 🔌 Explicación de Conexiones (Caja Negra)
+
+La siguiente tabla detalla las líneas de interfaz externa del controlador QSPI, su subsistema interno de destino y la explicación de su interconexión:
+
+| Señal / Bus | Ancho / Tipo | Subsistema de Destino | Justificación Técnica |
+| :--- | :---: | :--- | :--- |
+| `clk_i` | 1 bit (Entrada) | Control y Temporización (FSM / Timers) | Sincroniza todas las operaciones secuenciales de la máquina de estados y alimenta los contadores de tiempo ($t_{\text{CEM}}$ y *Dummy Cycles*). |
+| `rst_i` | 1 bit (Entrada) | Control y Temporización (FSM / Timers) | Permite llevar la FSM y los registros internos a un estado determinista y seguro tras el encendido o reinicio global. |
+| `addr_i` | 25 bits `[24:0]` (Entrada) | Camino de Datos (Decodificador Interno) | Proporciona el rango completo para direccionar 32 MB; los bits superiores ($A[24:23]$) seleccionan el chip mediante el `SN74HCS138`, y el resto gestiona el offset. |
+| `data_wr_i` | 32 bits (Entrada) | Camino de Datos (Staging Register) | Recibe la palabra paralela completa de la CPU para ser descompuesta secuencialmente en bloques de 4 bits (*nibbles*) hacia el bus QPI. |
+| `data_rd_o` | 32 bits (Salida) | Camino de Datos (SIPO Register) | Ensambla los *nibbles* leídos de la memoria física para reconstruir y devolver la palabra paralela de 32 bits hacia el procesador. |
+| `we_i` | 1 bit (Entrada) | Control y Temporización (FSM) | Define la bifurcación lógica en la FSM para habilitar las rutas de escritura (`0x02`) o lectura (`0x03`) según lo requiera la CPU. |
+| `req_i` | 1 bit (Entrada) | Control y Temporización (FSM) | Actúa como la bandera de solicitud (*strobe*) que saca a la máquina de estados del reposo (`IDLE`) para atender la petición de acceso. |
+| `ack_o` | 1 bit (Salida) | Control y Temporización (FSM) | Notifica de forma síncrona al procesador que la transacción de lectura o escritura ha finalizado exitosamente. |
+| `sel_o` | 2 bits `[1:0]` (Salida) | Camino de Datos (Decodificador Interno) | Conecta los bits de selección con el decodificador externo `SN74HCS138` para habilitar físicamente el banco de memoria correcto. |
+| `ce_n_o` | Líneas de Habilitación (Salida) | Control y Temporización / FSM | Gobierna la señal de selección activa en bajo ($\text{CS}\#$) para permitir los ciclos de autorrefresco y cumplir con el límite $t_{\text{CEM}}$. |
+| `sclk_o` | 1 bit (Salida) | Protocolo SPI (SCLK Gen) | Genera la señal de reloj serial externa sincronizada para la transferencia de comandos, direcciones y datos en la PSRAM. |
+| `sio_io` | 4 bits `[3:0]` (Bidireccional) | Protocolo SPI (Buffers Tri-estado) | Administra el bus Quad SPI de alta velocidad mediante control de alta impedancia (`Hi-Z`) para la transmisión multiplexada de datos. |
