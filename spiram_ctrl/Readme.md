@@ -45,7 +45,17 @@ Un vistazo rápido de los datos presentes en los datasheets pero relevantes para
 
 ## Mapeo físico del periférico
 
--Estamos trabajando en ello, el mapa se actualizará tan pronto como se confirmen las conexiones por ingeniería inversa-
+Partiendo del principio mencionado al inicio del documento, el dispositivo que se está trabajando es un periférico existente, por lo que es necesario visualizarlo. A continuación se muestra la imagen del dispositivo físico bajo el cual se está trabajando. 
+
+<p align="center">
+  <img src="../Images/Physical_Module.jpg" alt="SPI_RAM">
+</p>
+
+Con ello en mente, se aplicó ingeniería inversa para determinar las conexiones de cada uno de los pines tanto de las memorias `APS6404L-3SQ` como del decodificador principal `HCS138`. Para facilitar la visualización de las conexiones se realizó una codificación por colores independiente a la posteriormente expresada para los diagramas. Las flechas en los pines indican el flujo de la señal siendo dual en los canales correspondientes a la comunicación por QSPI y única en las demás líneas de control.
+
+<p align="center">
+  <img src="../Images/Diagramas SPI_RAM-Conexión memoria.drawio.svg" alt="SPI_RAM">
+</p>
 
 
 # Diagrama de flujo [IA asistido]
