@@ -62,7 +62,7 @@ Con ello en mente, se aplicó ingeniería inversa para determinar las conexiones
 
 Con base en la información presente en [Protocolo SPI](/SPI#20Protocol.md) y referenciando el hardware disponible se puede establecer el flujo del proceso que debe realizar el controlador durante la comunicación con la `CPU` y la `RAM`.
 
-## 🎨 Especificación del Código de Colores para Diagramas (Draw.io)
+## 🎨 Especificación del Código de Colores para Diagramas de flujo (Draw.io)
 
 Para garantizar consistencia visual y facilitar la lectura técnica de los diagramas de flujo del controlador QSPI, se aplica la siguiente paleta semántica según el tipo y función de cada bloque:
 
@@ -144,9 +144,23 @@ Puesto que algunas de las funciones requieren de explicación adicional respecto
 </p>
 
 
-# Diagrama de bloques [IA asistido. Sujeto a revisión]
+# Diagrama de bloques [IA asistido]
 
 Con base en la información presentada en el diagrama de flujo previo, se hace el diagrama de bloques correspondiente a dicho sistema. 
+
+## Código de Colores diagramas de bloques Draw.io
+
+Igual que en el punto anterior, para facilitar la visualización de los "dominios" presentes en el funcionamiento de este controlador, se dividen entre distintos colores como se muestra a continuación: 
+
+
+| Dominio / Componente | Color Sugerido (HEX) | Muestra | Descripción y Señales Agrupadas |
+| :--- | :---: | :---: | :--- |
+| **Núcleo del Controlador (RTL)** | `#2D3748` | ⬛ | Bloque central de la caja negra que representa la lógica secuencial y la FSM dentro de la FPGA. |
+| **Dominio del Procesador** | `#2B6CB0` | 🟦 | Agrupa todas las líneas de control y buses hacia la CPU (`clk_i`, `rst_i`, `addr_i [24:0]`, `data_wr_i`, `data_rd_o`, `we_i`, `req_i`, `ack_o`). |
+| **Dominio de Memoria Física** | `#276749` | 🟩 | Identifica las líneas de alta velocidad orientadas al bus de las PSRAM (`sclk_o`, `sio_io [3:0]`). |
+| **Dominio de Decodificación** | `#DD6B20` | 🟧 | Señala las líneas de selección hacia el exterior para el decodificador `SN74HCS138` (`sel_o [1:0]`, `ce_n_o`). |
+
+Un vistazo inicial de las conexiones del controlador entre los demás elementos de la FPGA se representa con el diagrama a continuación. Cabe aclarar que este diagrama no es detallado, así que requiere la ampliación detallada del controlador.
 
 ```mermaid
 graph LR
@@ -203,3 +217,11 @@ graph LR
     DECODER_138 -- Habilitacion CE2# --> RAM2
     DECODER_138 -- Habilitacion CE3# --> RAM3
 ```
+
+Con el diagrama de bloques previo y la representación general de las conexiones que deben existir entre el controlador y los demás componentes del sistema, se hace de forma particular, el denominado diagrama de caja negra del controlador `spiram_ctrl`: 
+
+<p align="center">
+  <img src="../Images/Blackbox.svg" alt="Blackbox spiram_ctrl">
+</p>
+
+
