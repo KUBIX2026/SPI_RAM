@@ -21,3 +21,4 @@ Every image in this folder will be assigned and specified in this file. Based on
 | `Establecer bus interno en modo 4-bits _ QPI.svg` | Downloaded picture from draw.io explaining Establecer bus interno en modo 4-bits _ QPI function | Own/co Draw.io |
 | `Diagramas SPI_RAM-Conexión memoria.drawio.svg` | Downloaded picture from draw.io of physical RAM module connection diagram | Own/co Draw.io |
 | `Configurar controlador en modo 1-bit SPI.svg` | Downloaded picture from draw.io explaining Configurar controlador en modo 1-bit SPI function | Own/co Draw.io |
+| `Blackbox.svg` | Downloaded picture from draw.io showing bloc diagram for spiram_ctrl | Own/co Draw.io |
