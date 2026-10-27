@@ -224,4 +224,30 @@ Con el diagrama de bloques previo y la representación general de las conexiones
   <img src="../Images/Blackbox.svg" alt="Blackbox spiram_ctrl">
 </p>
 
+A continuación se detalla la nomenclatura asignada a cada una de las líneas y buses de Entrada/Salida que componen la interfaz externa del controlador QSPI, agrupadas por su dominio funcional:
+
+### 1. Interfaz con el Procesador (Dominio CPU)
+| Nombre de Señal | Tipo / Ancho | Dirección | Descripción Funcional |
+| :--- | :---: | :---: | :--- |
+| `clk_i` | 1 bit | Entrada | Reloj maestro del sistema (proveniente de la FPGA). |
+| `rst_i` | 1 bit | Entrada | Señal de reinicio global (*Reset*) del sistema. |
+| `addr_i` | 25 bits `[24:0]` | Entrada | Bus de direcciones completo de la CPU para direccionar el espacio de memoria. |
+| `data_wr_i` | 32 bits | Entrada | Bus de datos de escritura enviados por el procesador hacia el controlador. |
+| `data_rd_o` | 32 bits | Salida | Bus de datos leídos desde la PSRAM y devueltos hacia el procesador. |
+| `we_i` | 1 bit | Entrada | Señal de habilitación de escritura (`1` = Escritura, `0` = Lectura). |
+| `req_i` | 1 bit | Entrada | Bandera de solicitud de acceso (*Strobe* o petición activa de la CPU). |
+| `ack_o` | 1 bit | Salida | Señal de reconocimiento o listo (*Ready/ACK*) para indicar fin de transacción a la CPU. |
+
+### 2. Interfaz con el Decodificador y Selección (Dominio de Direccionamiento)
+| Nombre de Señal | Tipo / Ancho | Dirección | Descripción Funcional |
+| :--- | :---: | :---: | :--- |
+| `sel_o` | 2 bits `[1:0]` | Salida | Bits superiores de dirección ($A[24:23]$) conectados a las entradas de selección del `SN74HCS138`. |
+| `ce_n_o` | Líneas de habilitación | Salida | Líneas de selección de chip activas en bajo (`CS#`) habilitadas hacia el banco de memorias PSRAM. |
+
+### 3. Interfaz con las Memorias Físicas (Dominio PSRAM)
+| Nombre de Señal | Tipo / Ancho | Dirección | Descripción Funcional |
+| :--- | :---: | :---: | :--- |
+| `sclk_o` | 1 bit | Salida | Señal de reloj serial generada por el controlador para sincronizar la comunicación con la PSRAM. |
+| `sio_io` | 4 bits `[3:0]` | Bidireccional | Bus Quad SIO (`SIO0`, `SIO1`, `SIO2`, `SIO3`) para la transferencia multiplexada de comandos, direcciones y datos. |
+
 
