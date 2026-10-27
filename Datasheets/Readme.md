@@ -6,7 +6,7 @@ Por la estructura del dispositivo actual se incluye el datasheet de dos componen
 2. HCS138/SN74HCS138
 
 ## AP Memory S6404L-3SQR
-Este dispositivo es una memoria 
+Este dispositivo es una memoria RAM compatible con QSPI de 8MB.
 
 ## HCS138/SN74HCS138
 Este dispositivo hace vez de controlador de las memorias para activar cada una según corresponda mediante la línea CE/CS.
