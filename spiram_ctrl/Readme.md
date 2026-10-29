@@ -241,3 +241,15 @@ La siguiente tabla detalla las líneas de interfaz externa del controlador QSPI,
 | `ce_n_o` | Líneas de Habilitación (Salida) | Control y Temporización / FSM | Gobierna la señal de selección activa en bajo ($\text{CS}$) para permitir los ciclos de autorrefresco y cumplir con el límite $t_{\text{CEM}}$. |
 | `sclk_o` | 1 bit (Salida) | Protocolo SPI (SCLK Gen) | Genera la señal de reloj serial externa sincronizada para la transferencia de comandos, direcciones y datos en la PSRAM. |
 | `sio_io` | 4 bits `[3:0]` (Bidireccional) | Protocolo SPI (Buffers Tri-estado) | Administra el bus Quad SPI de alta velocidad mediante control de alta impedancia (`Hi-Z`) para la transmisión multiplexada de datos. |
+
+Internamente se pueden apreciar algunas señales dentro del controlador, la descripción de cada una se especifica a continuación. 
+
+| Señal del Bus | Ancho / Tipo | Subsistema de Destino | Descripción Funcional / Justificación |
+| :--- | :---: | :--- | :--- |
+| `ctrl_bus` | 4 bit (Salida/Entrada FSM y SPI/Datapath) | Bus de control interno que contiene las señales de `shift_en`, `sample_en`, `dummy_en` y `load_regs` | Bus para la comunicación desde el susbsistema de control FSM hacia el SPI/Datapath. |
+| `load_regs` | 1 bit (Salida FSM) | Registros de Interfaz (Staging) | Ordena la captura y el almacenamiento temporal de la dirección de 25 bits (`addr_i`) y los datos de escritura (`data_wr_i`) provenientes de la CPU al detectarse el requerimiento (`req == 1`). |
+| `shift_en` | 1 bit (Entrada FSM) | Bloque de Desplazamiento y Serialización | Habilita el desplazamiento sincrónico de los bits o *nibbles* (4 bits) a través del bus QPI físico (`sio_io`) al ritmo del reloj `sclk_o`. |
+| `dummy_en` | 1 bit (Salida FSM) | Generador SCLK / Control SPI | Dispara la secuencia de ciclos de reloj de espera (*Dummy Cycles*) requeridos por la PSRAM antes de iniciar la fase de muestreo de lectura. |
+| `sample_en` | 1 bit (Salida FSM) | Bloque SIPO / Ensamblador de Datos | Habilita el muestreo y la captura de los *nibbles* entrantes desde la memoria en cada flanco ascendente de `sclk_o` durante las operaciones de lectura. |
+| `t_CEM` | 1 bit (Salida Temporizador/Entrada FSM) | Señal de interrupción indicada desde el temporizador para dar inicio a la secuencia de refresco de la memoria para evitar la corrupción de datos. |
+| `t_cph` | 1 bit (Salida FSM) | Señal de recuperación para la interrupción temporal del avance del registro y forzar CS# a nivel alto durante 50us. |
