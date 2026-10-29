@@ -271,6 +271,6 @@ La siguiente tabla detalla las líneas de interfaz externa del controlador QSPI,
 | `req_i` | 1 bit (Entrada) | Control y Temporización (FSM) | Actúa como la bandera de solicitud (*strobe*) que saca a la máquina de estados del reposo (`IDLE`) para atender la petición de acceso. |
 | `ack_o` | 1 bit (Salida) | Control y Temporización (FSM) | Notifica de forma síncrona al procesador que la transacción de lectura o escritura ha finalizado exitosamente. |
 | `sel_o` | 2 bits `[1:0]` (Salida) | Camino de Datos (Decodificador Interno) | Conecta los bits de selección con el decodificador externo `SN74HCS138` para habilitar físicamente el banco de memoria correcto. |
-| `ce_n_o` | Líneas de Habilitación (Salida) | Control y Temporización / FSM | Gobierna la señal de selección activa en bajo ($\text{CS}#$) para permitir los ciclos de autorrefresco y cumplir con el límite $t_{\text{CEM}}$. |
+| `ce_n_o` | Líneas de Habilitación (Salida) | Control y Temporización / FSM | Gobierna la señal de selección activa en bajo ($\text{CS}$) para permitir los ciclos de autorrefresco y cumplir con el límite $t_{\text{CEM}}$. |
 | `sclk_o` | 1 bit (Salida) | Protocolo SPI (SCLK Gen) | Genera la señal de reloj serial externa sincronizada para la transferencia de comandos, direcciones y datos en la PSRAM. |
 | `sio_io` | 4 bits `[3:0]` (Bidireccional) | Protocolo SPI (Buffers Tri-estado) | Administra el bus Quad SPI de alta velocidad mediante control de alta impedancia (`Hi-Z`) para la transmisión multiplexada de datos. |
