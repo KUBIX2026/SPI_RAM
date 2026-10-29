@@ -78,39 +78,6 @@ Para garantizar consistencia visual y facilitar la lectura técnica de los diagr
   <img src="../Images/SPI_RAM.svg" alt="SPI_RAM">
 </p>
 
-```mermaid
-flowchart TD
-    Start([Inicio / Reset del Sistema]) --> InitMode[Configurar controlador en modo 1-bit SPI]
-    InitMode --> SendEnableQPI[Transmitir comando de habilitación Quad-SPI 0x35 por SIO0]
-    SendEnableQPI --> SetQPIFlag[Establecer bus interno en modo 4-bits / QPI]
-    SetQPIFlag --> Idle[Estado IDLE: Esperar solicitud de la CPU<br>Líneas CE# en alto / SCLK = 0]
-
-    Idle --> CheckReq{¿CPU solicita acceso?<br>req == 1}
-    CheckReq -- No --> Idle
-    CheckReq -- Sí --> LatchBus[Capturar bus de la CPU:<br>Dirección A de 25 bits, Datos y WE]
-
-    LatchBus --> DecodeChip[Decodificar bits superiores A24-A23<br>Enviar SEL a entradas de SN74HCS138]
-    DecodeChip --> AssertCE[El SN74HCS138 baja la línea CS# a 0 V<br>de la memoria seleccionada]
-    AssertCE --> SendOpcode[Enviar OpCode de operación por bus Quad SIO<br>0x03 Lectura / 0x02 Escritura]
-    SendOpcode --> SendAddr[Enviar dirección relativa de 23 bits A22-A0<br>por el bus Quad SIO]
-
-    SendAddr --> CheckWE{¿Tipo de operación?}
-
-    CheckWE -- Escritura WE = 1 --> WriteData[Transferir n-bytes de datos<br>desde CPU hacia PSRAM por bus SIO]
-    WriteData --> DeassertCE[Levantar línea CS# a 1 V<br>Finalizar transacción en memoria]
-
-    CheckWE -- Lectura WE = 0 --> DummyCycles[Generar ciclos de reloj Dummy<br>Esperar recuperación analógica de PSRAM]
-    DummyCycles --> ReadData[Muestrear datos desde PSRAM por bus SIO<br>en cada flanco ascendente de SCLK]
-    ReadData --> SendToCPU[Cargar dato en bus de entrada de la CPU]
-    SendToCPU --> DeassertCE
-
-    DeassertCE --> SendAck[Generar señal ACK / Ready a la CPU]
-    SendAck --> CheckTimer{¿Límite t_CEM excedido?<br>Burst mayor a 4 us}
-    CheckTimer -- Sí --> PauseCE[Mantener CS# en 1 V durante 50 ns<br>Permitir autorrefresco interno de PSRAM]
-    CheckTimer -- No --> Idle
-    PauseCE --> Idle
-```
-
 1. **Óvalos (`Inicio / Reset`):** Indican el arranque del hardware desde que la FPGA recibe alimentación o una señal de reset.
 2. **Rectángulos (`Procesos`):**
    * **`Configurar / Transmitir QPI`:** Ocurren una sola vez al encender el sistema para pasar las memorias a modo de 4 bits.
