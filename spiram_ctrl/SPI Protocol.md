@@ -72,7 +72,7 @@ El protocolo SPI cuenta con 4 modos de comunicación y para que funcione correct
 
 * `La polaridad del reloj` (`CPOL`): define el nivel al que la línea `SCK` se considera inactiva.
 1. `CPOL` = 0 indica que el nivel de la señal `SCK` en el estado inactivo es baja y el estado efectivo es alta.
-2. `CPOL` = 1 indica que el nivel de la señal `SCK` en el estado inactivo es alta y el estado efectivo es baha.
+2. `CPOL` = 1 indica que el nivel de la señal `SCK` en el estado inactivo es alta y el estado efectivo es baja.
 
 * `La fase del reloj` (`CPHA`): define la temporización de los bits de datos respecto a la línea de reloj.
 1. `CPHA` = 0 indica que el terminal de salida manda los datos en el flanco de bajada del ciclo anterior de reloj y el terminal de entrada capta los datos en el flanco de subida del ciclo de reloj actual. La salida permanece válida hasta el flanco de bajada del ciclo actual.
