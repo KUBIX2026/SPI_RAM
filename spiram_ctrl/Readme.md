@@ -196,14 +196,12 @@ A continuación se detalla la nomenclatura asignada a cada una de las líneas y 
 ## 1. Interfaz con el Procesador (Dominio CPU)
 | Nombre de Señal | Tipo / Ancho | Dirección | Descripción Funcional |
 | :--- | :---: | :---: | :--- |
-| `clk_i` | 1 bit | Entrada | Reloj maestro del sistema (proveniente de la FPGA). |
-| `rst_i` | 1 bit | Entrada | Señal de reinicio global (*Reset*) del sistema. |
-| `addr_i` | 25 bits `[24:0]` | Entrada | Bus de direcciones completo de la CPU para direccionar el espacio de memoria. |
-| `data_wr_i` | 32 bits | Entrada | Bus de datos de escritura enviados por el procesador hacia el controlador. |
-| `data_rd_o` | 32 bits | Salida | Bus de datos leídos desde la PSRAM y devueltos hacia el procesador. |
-| `we_i` | 1 bit | Entrada | Señal de habilitación de escritura (`1` = Escritura, `0` = Lectura). |
-| `req_i` | 1 bit | Entrada | Bandera de solicitud de acceso (*Strobe* o petición activa de la CPU). |
-| `ack_o` | 1 bit | Salida | Señal de reconocimiento o listo (*Ready/ACK*) para indicar fin de transacción a la CPU. |
+| `d_in` | 32 bit | Entrada | Contiene la información de del procesador como la señal de reloj, habilitación de escritura, reconocimiento y reinicio del sistema. |
+| `cs` | 1 bit | Entrada | Bandera de solicitud de acceso (*Strobe* o petición activa de la CPU). |
+| `addr` | 25 bits `[24:0]` | Entrada | Bus de direcciones completo de la CPU para direccionar el espacio de memoria. |
+| `wr` | 32 bits | Entrada | Bus de datos de escritura enviados por el procesador hacia el controlador. |
+| `rd` | 32 bits | Salida | Bus de datos leídos desde la PSRAM y devueltos hacia el procesador. |
+| `d_out` | 32 bit | Salida | Señal con información de salida del controlador hacia CPU. |
 
 ## 2. Interfaz con el Decodificador y Selección (Dominio de Direccionamiento)
 | Nombre de Señal | Tipo / Ancho | Dirección | Descripción Funcional |
@@ -229,14 +227,12 @@ La siguiente tabla detalla las líneas de interfaz externa del controlador QSPI,
 
 | Señal / Bus | Ancho / Tipo | Subsistema de Destino | Justificación Técnica |
 | :--- | :---: | :--- | :--- |
-| `clk_i` | 1 bit (Entrada) | Control y Temporización (FSM / Timers) | Sincroniza todas las operaciones secuenciales de la máquina de estados y alimenta los contadores de tiempo ($t_{\text{CEM}}$ y *Dummy Cycles*). |
-| `rst_i` | 1 bit (Entrada) | Control y Temporización (FSM / Timers) | Permite llevar la FSM y los registros internos a un estado determinista y seguro tras el encendido o reinicio global. |
-| `addr_i` | 25 bits `[24:0]` (Entrada) | Camino de Datos (Decodificador Interno) | Proporciona el rango completo para direccionar 32 MB; los bits superiores ($A[24:23]$) seleccionan el chip mediante el `SN74HCS138`, y el resto gestiona el offset. |
-| `data_wr_i` | 32 bits (Entrada) | Camino de Datos (Staging Register) | Recibe la palabra paralela completa de la CPU para ser descompuesta secuencialmente en bloques de 4 bits (*nibbles*) hacia el bus QPI. |
-| `data_rd_o` | 32 bits (Salida) | Camino de Datos (SIPO Register) | Ensambla los *nibbles* leídos de la memoria física para reconstruir y devolver la palabra paralela de 32 bits hacia el procesador. |
-| `we_i` | 1 bit (Entrada) | Control y Temporización (FSM) | Define la bifurcación lógica en la FSM para habilitar las rutas de escritura (`0x02`) o lectura (`0x03`) según lo requiera la CPU. |
-| `req_i` | 1 bit (Entrada) | Control y Temporización (FSM) | Actúa como la bandera de solicitud (*strobe*) que saca a la máquina de estados del reposo (`IDLE`) para atender la petición de acceso. |
-| `ack_o` | 1 bit (Salida) | Control y Temporización (FSM) | Notifica de forma síncrona al procesador que la transacción de lectura o escritura ha finalizado exitosamente. |
+| `d_in` | 32 bit  (Entrada) | Control y Temporización (FSM /Timers) | Contiene la información de del procesador como la señal de reloj, habilitación de escritura, reconocimiento y reinicio del sistema. |
+| `cs` | 1 bit  (Entrada) | Control y Temporización (FSM) | Actúa como la bandera de solicitud (strobe) que saca a la máquina de estados del reposo (`IDLE`) para atender la petición de acceso. |
+| `d_out` | 32 bit  (Salida) | CPU | Señal con información de salida del controlador hacia CPU. |
+| `addr` | 25 bits `[24:0]` (Entrada) | Camino de Datos (Decodificador Interno) | Proporciona el rango completo para direccionar 32 MB; los bits superiores ($A[24:23]$) seleccionan el chip mediante el `SN74HCS138`, y el resto gestiona el offset. |
+| `rd` | 32 bits (Salida) | Camino de Datos (SIPO Register) | Ensambla los *nibbles* leídos de la memoria física para reconstruir y devolver la palabra paralela de 32 bits hacia el procesador. |
+| `wr` | 32 bits (Entrada) | Camino de Datos (Staging Register) | Recibe la palabra paralela completa de la CPU para ser descompuesta secuencialmente en bloques de 4 bits (*nibbles*) hacia el bus QPI. |
 | `sel_o` | 2 bits `[1:0]` (Salida) | Camino de Datos (Decodificador Interno) | Conecta los bits de selección con el decodificador externo `SN74HCS138` para habilitar físicamente el banco de memoria correcto. |
 | `ce_n_o` | Líneas de Habilitación (Salida) | Control y Temporización / FSM | Gobierna la señal de selección activa en bajo ($\text{CS}$) para permitir los ciclos de autorrefresco y cumplir con el límite $t_{\text{CEM}}$. |
 | `sclk_o` | 1 bit (Salida) | Protocolo SPI (SCLK Gen) | Genera la señal de reloj serial externa sincronizada para la transferencia de comandos, direcciones y datos en la PSRAM. |
