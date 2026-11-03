@@ -74,9 +74,9 @@ Para garantizar consistencia visual y facilitar la lectura técnica de los diagr
 | **Control Interno y Registros** | `#1A202C` | ⬛ | Indica operaciones internas de la FPGA, como registro de buses, decodificación para `SEL[1:0]` o manejo de $CS$\#. |
 | **Pausas de Seguridad / Alertas** | `#C05621` | 🟧 | Reservado exclusivamente para la interrupción de $t_{\text{CEM}}$ (pausa de $50\text{ ns}$ para autorrefresco de memoria). |
 
-<div style="background-color: #0d1117; padding: 15px; border-radius: 6px;">
+<p align="center">
   <img src="../Images/SPI_RAM.svg" alt="SPI_RAM">
-</div>
+</p>
 
 1. **Óvalos (`Inicio / Reset`):** Indican el arranque del hardware desde que la FPGA recibe alimentación o una señal de reset.
 2. **Rectángulos (`Procesos`):**
@@ -94,21 +94,21 @@ Puesto que algunas de las funciones requieren de explicación adicional respecto
 
 ### Configuración 1-bit SPI
 
-<div style="background-color: #0d1117; padding: 15px; border-radius: 6px;">
+<p align="center">
   <img src="../Images/Configurar%20controlador%20en%20modo%201-bit%20SPI.svg" alt="Configurar controlador en modo 1-bit SPI">
-</div>
+</p>
 
 ### Transmisión comando habilitación Q-SPI
 
-<div style="background-color: #0d1117; padding: 15px; border-radius: 6px;">
+<p align="center">
   <img src="../Images/Transmitir%20comando%20de%20habilitación%20Quad-SPI%200x35%20por%20SIO0.svg" alt="Transmitir comando de habilitación Quad-SPI 0x35 por SIO0">
-</div>
+</p>
 
 ### Configuración bus interno a 4-bit SPI
 
-<div style="background-color: #0d1117; padding: 15px; border-radius: 6px;">
+<p align="center">
   <img src="../Images/Establecer%20bus%20interno%20en%20modo%204-bits%20_%20QPI.svg" alt="Establecer bus interno en modo 4-bits _ QPI">
-</div>
+</p>
 
 # Diagrama de bloques [IA asistido]
 
