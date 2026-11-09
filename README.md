@@ -8,4 +8,4 @@ Para información respecto al procedimiento del controlador para la RAM ir a [sp
 
 ## Integrantes de equipo
 1. Daniel Eduardo Ballén Baena
-2. Andrés Felipe Hortua Ñustes
+2. Andrés Felipe Hortúa Ñustes
