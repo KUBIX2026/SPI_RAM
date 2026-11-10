@@ -201,6 +201,7 @@ A continuación se detalla la nomenclatura asignada a cada una de las líneas y 
 | `wr` | 1 bit | Entrada | Bandera para indicar orden de escritura al controlador desde el procesador. |
 | `rd` | 1 bit | Entrada | Bandera para indicar orden de lectura al controlador desde el procesador. |
 | `d_out` | 32 bit | Salida | Señal con los datos ensamblados del controlador hacia CPU. |
+| `reset` | 1 bit (Entrada) | Control y Temporización (FSM / Timers) | Señal de reinicio global (Reset) del sistema. |
 
 ## 2. Interfaz con el Decodificador y Selección (Dominio de Direccionamiento)
 | Nombre de Señal | Tipo / Ancho | Dirección | Descripción Funcional |
@@ -226,12 +227,13 @@ La siguiente tabla detalla las líneas de interfaz externa del controlador QSPI,
 
 | Señal / Bus | Ancho / Tipo | Subsistema de Destino | Justificación Técnica |
 | :--- | :---: | :--- | :--- |
-| `d_in` | 32 bit  (Entrada) | Control y Temporización (FSM /Timers) | Contiene la información desde del procesador como datos de entrada, la señal de reloj, habilitación de escritura, reconocimiento y reinicio del sistema. |
-| `cs` | 1 bit  (Entrada) | Control y Temporización (FSM) | Actúa como la bandera de solicitud (strobe) que saca a la máquina de estados del reposo (`IDLE`) para atender la petición de acceso. |
-| `d_out` | 32 bit  (Salida) | CPU | Señal con los datos ensamblados del controlador hacia CPU. |
-| `addr` | 25 bits `[24:0]` (Entrada) | Camino de Datos (Decodificador Interno) | Proporciona el rango completo para direccionar 32 MB; los bits superiores ($A[24:23]$) seleccionan el chip mediante el `SN74HCS138`, y el resto gestiona el offset. |
-| `rd` | 1 bit (Entrada) | Control y Temporización (FSM) | Bandera para indicar orden de lectura al controlador desde el procesador. |
-| `wr` | 1 bit (Entrada) | Control y Temporización (FSM) | Bandera para indicar orden de escritura al controlador desde el procesador. |
+| `wdate` | 32 bit  (Entrada) | Control y Camino de Datos (FSM / SPI-Datapath) | Contiene la información desde del procesador como datos de entrada. |
+| `cs` | 1 bit  (Entrada) | Control y Decodificación (FSM/Decodificador) | Actúa como la bandera de solicitud (strobe) que saca a la máquina de estados del reposo (`IDLE`) para atender la petición de acceso. |
+| `rdata` | 32 bit  (Salida) | CPU | Señal con los datos ensamblados del controlador hacia CPU. |
+| `addr` | 25 bits `[24:0]` (Entrada) | Decodificador | Proporciona el rango completo para direccionar 32 MB; los bits superiores ($A[24:23]$) seleccionan el chip mediante el `SN74HCS138`, y el resto gestiona el offset. |
+| `rd` | 1 bit (Entrada) | Control (FSM) | Bandera para indicar orden de lectura al controlador desde el procesador. |
+| `wr` | 1 bit (Entrada) | Control (FSM) | Bandera para indicar orden de escritura al controlador desde el procesador. |
+| `reset` | 1 bit (Entrada) | Control y Temporización (FSM / Timers) | Permite llevar la FSM y los registros internos a un estado determinista y seguro tras el encendido o reinicio global. |
 | `sel_o` | 2 bits `[1:0]` (Salida) | Camino de Datos (Decodificador Interno) | Conecta los bits de selección con el decodificador externo `SN74HCS138` para habilitar físicamente el banco de memoria correcto. |
 | `ce_n_o` | Líneas de Habilitación (Salida) | Control y Temporización / FSM | Gobierna la señal de selección activa en bajo ($\text{CS}$) para permitir los ciclos de autorrefresco y cumplir con el límite $t_{\text{CEM}}$. |
 | `sclk_o` | 1 bit (Salida) | Protocolo SPI (SCLK Gen) | Genera la señal de reloj serial externa sincronizada para la transferencia de comandos, direcciones y datos en la PSRAM. |
